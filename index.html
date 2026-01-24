@@ -5,27 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="✨ أذكار وثواب - صدقة جارية باسمك ✨">
     <meta property="og:description" content="فعل التنبيهات لتصلك أذكار يومية وتشارك الثواب مع أحبائك">
-    <meta property="og:image" content="og-image.jpg">
+    <meta property="og:image" content="https://medo7788.github.io/giftapp/og-image.jpg">
     <title>أذكار المسلم اليومية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: #f0f4f8; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; width: 90%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; border-top: 5px solid #1b4d3e; }
-        .dua-box { background: #f9f9f9; padding: 15px; border-radius: 12px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.2rem; color: #2d3748; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; text-align: center; box-sizing: border-box; }
-        .btn { background: #25D366; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        .card { background: white; width: 92%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; border-top: 6px solid #1b4d3e; }
+        .main-img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
+        .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; line-height: 1.6; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; text-align: center; font-size: 1rem; box-sizing: border-box; }
+        .btn { background: #25D366; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.2rem; transition: 0.3s; }
+        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2 style="color: #1b4d3e;">🌹 صدقة جارية 🌹</h2>
-        <div class="dua-box" id="displayDua">جاري تحميل ذكر اليوم...</div>
+        <img src="og-image.jpg" class="main-img" alt="صدقة جارية" onerror="this.src='https://medo7788.github.io/giftapp/og-image.jpg'">
+        <h2 style="color: #1b4d3e; margin-top: 0;">🌹 صدقة جارية 🌹</h2>
+        <div class="dua-box" id="displayDua">سبحان الله وبحمده 🕌</div>
         <input type="text" id="userName" placeholder="اكتب اسمك هنا...">
         <button class="btn" onclick="activateSystem()">إنشاء الصدقة وإرسالها ✅</button>
     </div>
 
     <script>
-        const PUBLIC_KEY = "BCp-mO8v-XU9A_JqN-8u4R0u5T6-rQ5G8_z7-m_Your_Public_Key_Here"; // تم تجهيزه
+        const PUBLIC_KEY = "BCp-mO8v-XU9A_JqN-8u4R0u5T6-rQ5G8_z7-m_Your_Public_Key_Here"; 
         const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com/save_sub";
 
         async function loadDua() {
@@ -36,26 +39,39 @@
                 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
                 const today = data[months[now.getMonth()]].find(d => d.day === now.getDate());
                 document.getElementById('displayDua').innerText = today.text + " " + today.emoji;
-            } catch (e) { document.getElementById('displayDua').innerText = "سبحان الله وبحمده 🕌"; }
+            } catch (e) { console.log("Using default dua"); }
         }
         loadDua();
 
         async function activateSystem() {
-            const name = document.getElementById('userName').value || "محب للخير";
+            const nameInput = document.getElementById('userName');
+            const name = nameInput.value.trim() || "محب للخير";
+            const dua = document.getElementById('displayDua').innerText;
+
+            // 1. محاولة تسجيل الإشعارات (Capturing)
             if ('serviceWorker' in navigator) {
-                const reg = await navigator.serviceWorker.register('sw.js');
-                const sub = await reg.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: PUBLIC_KEY
-                });
-                await fetch(SERVER_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({subscription: sub, name: name})
-                });
+                try {
+                    const reg = await navigator.serviceWorker.register('sw.js');
+                    const sub = await reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: PUBLIC_KEY
+                    });
+                    await fetch(SERVER_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({subscription: sub, name: name})
+                    });
+                } catch (err) { console.log("Notification skipped"); }
             }
-            const text = `🌹 صدقة جارية من: ${name}\n${document.getElementById('displayDua').innerText}\nرابط الصدقة:\n${window.location.href}`;
-            window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+
+            // 2. تشغيل الواتساب (الإرسال الإجباري)
+            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${dua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
+            const waUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+            const webWaUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+            
+            // محاولة فتح التطبيق أولاً، ثم المتصفح
+            window.location.href = waUrl;
+            setTimeout(() => { window.location.href = webWaUrl; }, 500);
         }
     </script>
 </body>
